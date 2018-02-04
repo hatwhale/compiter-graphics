@@ -15,8 +15,7 @@ https://github.com/g-truc/glm
 ### FreeImage
 https://github.com/sdottaka/freeimage
 
-### Installation example
-http://programmersforum.ru/showthread.php?p=1539400
+Installation example: http://programmersforum.ru/showthread.php?p=1539400
 
 ## Syntax highlighting extension for GLSL:
 ### NShader
