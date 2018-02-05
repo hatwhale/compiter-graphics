@@ -1,6 +1,11 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
+
+#ifdef _DEBUG
+#pragma comment(lib, "glew32d.lib")
+#else
 #pragma comment(lib, "glew32.lib")
+#endif
 
 #include "common_header.h"
 

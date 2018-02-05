@@ -65,13 +65,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\Win32$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\Win32\Debug$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\Win32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\Win32\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
