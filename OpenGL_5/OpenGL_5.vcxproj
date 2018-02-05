@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{7AED8512-DC6F-46DB-A1EE-8618A86208A0}</ProjectGuid>
+    <ProjectGuid>{645A55D4-4EB8-42B0-B1E6-D95EA6C17640}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -65,8 +65,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\Win32$(LibraryPath)</LibraryPath>
-    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -75,11 +74,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\x64\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\x64\Release;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -111,20 +110,59 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="OpenGLControl.cpp" />
-    <ClCompile Include="RenderScene.cpp" />
-    <ClCompile Include="Shaders.cpp" />
-    <ClCompile Include="Win_OpenGLApp.cpp" />
+    <ClCompile Include="assimp_model.cpp" />
+    <ClCompile Include="dirLight.cpp" />
+    <ClCompile Include="flyingCamera.cpp" />
+    <ClCompile Include="freeTypeFont.cpp" />
+    <ClCompile Include="heightmap.cpp" />
+    <ClCompile Include="material.cpp" />
+    <ClCompile Include="openGLControl.cpp" />
+    <ClCompile Include="particle_system_tf.cpp" />
+    <ClCompile Include="renderScene.cpp" />
+    <ClCompile Include="shaders.cpp" />
+    <ClCompile Include="skybox.cpp" />
+    <ClCompile Include="static_geometry.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="vertexBufferObject.cpp" />
+    <ClCompile Include="win_OpenGLApp.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="assimp_model.h" />
     <ClInclude Include="common_header.h" />
-    <ClInclude Include="OpenGLControl.h" />
-    <ClInclude Include="Shaders.h" />
-    <ClInclude Include="Win_OpenGLApp.h" />
+    <ClInclude Include="dirLight.h" />
+    <ClInclude Include="flyingCamera.h" />
+    <ClInclude Include="freeTypeFont.h" />
+    <ClInclude Include="heightmap.h" />
+    <ClInclude Include="material.h" />
+    <ClInclude Include="openGLControl.h" />
+    <ClInclude Include="particle_system_tf.h" />
+    <ClInclude Include="shaders.h" />
+    <ClInclude Include="skybox.h" />
+    <ClInclude Include="static_geometry.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="vertexBufferObject.h" />
+    <ClInclude Include="win_OpenGLApp.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\shaders\shader.frag" />
-    <None Include="data\shaders\shader.vert" />
+    <None Include="data\shaders\blaze_gen_common.geom" />
+    <None Include="data\shaders\blaze_part_gen_box.geom" />
+    <None Include="data\shaders\dirLight.frag" />
+    <None Include="data\shaders\font2D.frag" />
+    <None Include="data\shaders\main_shader.frag" />
+    <None Include="data\shaders\main_shader.vert" />
+    <None Include="data\shaders\normal_displayer.frag" />
+    <None Include="data\shaders\normal_displayer.geom" />
+    <None Include="data\shaders\normal_displayer.vert" />
+    <None Include="data\shaders\ortho2D.frag" />
+    <None Include="data\shaders\ortho2D.vert" />
+    <None Include="data\shaders\particles_render.frag" />
+    <None Include="data\shaders\particles_render.geom" />
+    <None Include="data\shaders\particles_render.vert" />
+    <None Include="data\shaders\particles_update.frag" />
+    <None Include="data\shaders\particles_update.geom" />
+    <None Include="data\shaders\particles_update.vert" />
+    <None Include="data\shaders\terrain.frag" />
+    <None Include="data\shaders\terrain.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
