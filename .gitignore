@@ -283,3 +283,7 @@ __pycache__/
 
 # Windows thumbnail cache
 [Tt]humb*.db
+
+# Compiled Dynamic and Static libraries
+*.dll
+*.lib
