@@ -281,3 +281,6 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# Windows thumbnail cache
+[Tt]humb*.db
