@@ -96,8 +96,10 @@ void InitScene(LPVOID lpParam)
 	
 	cCamera = CFlyingCamera(glm::vec3(0.0f, 30.0f, 100.0f), glm::vec3(0.0f, 30.0f, 99.0f), glm::vec3(0.0f, 1.0f, 0.0f), 25.0f, 0.1f);
 	cCamera.SetMovingKeys('W', 'S', 'A', 'D');
+	cCamera.ResetMouse();
 
-	sbMainSkybox.LoadSkybox("data\\skyboxes\\bluefreeze\\", "bluefreeze_front.jpg", "bluefreeze_back.jpg", "bluefreeze_right.jpg", "bluefreeze_left.jpg", "bluefreeze_top.jpg", "bluefreeze_top.jpg");
+	//sbMainSkybox.LoadSkybox("data\\skyboxes\\bluefreeze\\", "bluefreeze_front.jpg", "bluefreeze_back.jpg", "bluefreeze_left.jpg", "bluefreeze_right.jpg", "bluefreeze_top.jpg", "bluefreeze_bottom.jpg");
+	sbMainSkybox.LoadSkybox("data\\skyboxes\\skybox_day\\", "front.jpg", "back.jpg", "left.jpg", "right.jpg", "top.jpg", "bottom.jpg");
 
 	dlSun = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f)/2, -sqrt(2.0f)/2, 0), 0.5f, 0);
 
