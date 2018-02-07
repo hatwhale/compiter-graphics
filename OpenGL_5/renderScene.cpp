@@ -39,6 +39,7 @@ CAssimpModel amModels[3];
 CMultiLayeredHeightmap hmWorld;
 
 int iTorusFaces;
+float fRotationAngle = 50.0f;
 
 bool bDisplayNormals = false; // Do not display normals by default
 
@@ -95,7 +96,7 @@ void InitScene(LPVOID lpParam)
 	ftFont.SetShaderProgram(&spFont2D);
 	
 	cCamera = CFlyingCamera(glm::vec3(0.0f, 30.0f, 100.0f), glm::vec3(0.0f, 30.0f, 99.0f), glm::vec3(0.0f, 1.0f, 0.0f), 25.0f, 0.1f);
-	cCamera.SetMovingKeys('W', 'S', 'A', 'D');
+	cCamera.SetMovingKeys('W', 'S', 'A', 'D', VK_SHIFT);
 	cCamera.ResetMouse();
 
 	//sbMainSkybox.LoadSkybox("data\\skyboxes\\bluefreeze\\", "bluefreeze_front.jpg", "bluefreeze_back.jpg", "bluefreeze_left.jpg", "bluefreeze_right.jpg", "bluefreeze_top.jpg", "bluefreeze_bottom.jpg");
@@ -105,6 +106,7 @@ void InitScene(LPVOID lpParam)
 
 	amModels[0].LoadModelFromFile("data\\models\\house\\house.3ds");
 	amModels[1].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
+	amModels[2].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
 	
 	CAssimpModel::FinalizeVBO();
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
@@ -196,6 +198,15 @@ void RenderScene(LPVOID lpParam)
 	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 	amModels[1].RenderModel();
 
+	// ... and another treasure chest
+
+	mModel = glm::translate(glm::mat4(1.0), glm::vec3(25.0f, 17.5f, -6.0f));
+	mModel = glm::rotate(mModel, -90.0f, glm::vec3(0, 1.0f, 0));
+	mModel = glm::scale(mModel, glm::vec3(0.5f, 0.5f, 0.5f));
+
+	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+	amModels[2].RenderModel();
+
 	// Render 3 rotated tori to create interesting object
 
 	tTextures[5].BindTexture();
@@ -224,7 +235,7 @@ void RenderScene(LPVOID lpParam)
 		glDrawArrays(GL_TRIANGLES, 0, iTorusFaces*3);
 	}
 
-	fGlobalAngle += appMain.sof(50.0f);
+	fGlobalAngle += appMain.sof(fRotationAngle);
 
 	// Now we're going to render terrain
 
@@ -283,6 +294,15 @@ void RenderScene(LPVOID lpParam)
 		spNormalDisplayer.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 		amModels[1].RenderModel(GL_POINTS);
 
+		// ... and another treasure chest again
+
+		mModel = glm::translate(glm::mat4(1.0), glm::vec3(25.0f, 17.5f, -6.0f));
+		mModel = glm::rotate(mModel, -90.0f, glm::vec3(0, 1.0f, 0));
+		mModel = glm::scale(mModel, glm::vec3(0.5f, 0.5f, 0.5f));
+
+		spNormalDisplayer.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+		amModels[2].RenderModel(GL_POINTS);
+
 		glBindVertexArray(uiVAOSceneObjects);
 
 		FOR(i, 2)
@@ -330,9 +350,13 @@ void RenderScene(LPVOID lpParam)
 	
 	spFont2D.SetUniform("vColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	ftFont.Print("OpenGL_5 2017-2018", 20, 20, 24);
+	ftFont.Print("Kasyanov Ilya", w-200, 20, 24);
 
 	ftFont.PrintFormatted(20, h-30, 20, "FPS: %d", oglControl->GetFPS());
 	ftFont.PrintFormatted(20, h-80, 20, "Particles: %d", psMainParticleSystem.GetNumParticles());
+
+	ftFont.PrintFormatted(w-200, h - 30, 20, "Camera Yaw: %.2f", cCamera.fAngleY);
+	ftFont.PrintFormatted(w-200, h - 60, 20, "Camera Pitch: %.2f", cCamera.fAngleX);
 
 	ftFont.PrintFormatted(20, h-110, 20, "Specular Intensity: %.2f (Press 'Q' and 'E' to change)", matShiny.fSpecularIntensity);
 	if(Keys::Key('Q'))matShiny.fSpecularIntensity -= appMain.sof(0.2f);
@@ -342,8 +366,12 @@ void RenderScene(LPVOID lpParam)
 	if(Keys::Key('Z'))matShiny.fSpecularPower -= appMain.sof(8.0f);
 	if(Keys::Key('C'))matShiny.fSpecularPower += appMain.sof(8.0f);
 
-	ftFont.PrintFormatted(20, h-200, 20, "Displaying Normals: %s (Press 'N' to toggle)", bDisplayNormals ? "Yes" : "Nope");
-	if(Keys::Onekey('N'))bDisplayNormals = !bDisplayNormals;
+	ftFont.PrintFormatted(20, h-190, 20, "Torus Rotation Speed: %.2f (Press '1' and '3' to change)", fRotationAngle);
+	if (Keys::Key('1'))fRotationAngle -= appMain.sof(10.0f);
+	if (Keys::Key('3'))fRotationAngle += appMain.sof(10.0f);
+
+	ftFont.PrintFormatted(20, h-250, 20, "Displaying Normals: %s (Press 'N' to toggle)", bDisplayNormals ? "Yes" : "Nope");
+	if (Keys::Onekey('N'))bDisplayNormals = !bDisplayNormals;
 
 	glEnable(GL_DEPTH_TEST);	
 	if(Keys::Onekey(VK_ESCAPE))PostQuitMessage(0);

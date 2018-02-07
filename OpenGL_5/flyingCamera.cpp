@@ -118,12 +118,13 @@ Result:	Sets Keys for moving camera.
 
 /*---------------------------------------------*/
 
-void CFlyingCamera::SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight)
+void CFlyingCamera::SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight, int a_SpeedUp)
 {
 	iForw = a_iForw;
 	iBack = a_iBack;
 	iLeft = a_iLeft;
 	iRight = a_iRight;
+	iSpeedUp = a_SpeedUp;
 }
 
 /*-----------------------------------------------
@@ -157,6 +158,7 @@ void CFlyingCamera::Update()
 	if(Keys::Key(iBack))vMoveBy -= vMove*appMain.sof(1.0f);
 	if(Keys::Key(iLeft))vMoveBy -= vStrafe*appMain.sof(1.0f);
 	if(Keys::Key(iRight))vMoveBy += vStrafe*appMain.sof(1.0f);
+	if (Keys::Key(iSpeedUp))vMoveBy *= 2;
 	vEye += vMoveBy; vView += vMoveBy;
 }
 

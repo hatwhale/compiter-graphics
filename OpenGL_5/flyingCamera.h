@@ -14,7 +14,7 @@ public:
 	void Update();
 	glm::mat4 Look();
 
-	void SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight);
+	void SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight, int a_SpeedUp);
 	void ResetMouse();
 
 	// Functions that set viewing angles
@@ -26,7 +26,7 @@ public:
 
 private:
 	POINT pCur; // For mosue rotation
-	int iForw, iBack, iLeft, iRight;
+	int iForw, iBack, iLeft, iRight, iSpeedUp;
 };
 
 extern CFlyingCamera cCamera;
