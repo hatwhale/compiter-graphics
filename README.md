@@ -21,6 +21,16 @@ https://github.com/g-truc/glm/releases/download/0.9.8.5/glm-0.9.8.5.zip
 ### FreeImage
 https://github.com/sdottaka/freeimage
 
+### FreeType
+https://www.freetype.org/index.html
+
+https://sourceforge.net/projects/freetype/files/latest/download?source=files
+
+### Assimp
+http://assimp.sourceforge.net/
+
+https://github.com/assimp/assimp/archive/v3.3.1.zip
+
 ## Installation example:
 http://programmersforum.ru/showthread.php?p=1539400
 
