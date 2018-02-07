@@ -106,7 +106,7 @@ void InitScene(LPVOID lpParam)
 
 	amModels[0].LoadModelFromFile("data\\models\\house\\house.3ds");
 	amModels[1].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
-	amModels[2].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
+	amModels[2].LoadModelFromFile("data\\models\\skull\\Skull.obj");
 	
 	CAssimpModel::FinalizeVBO();
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
