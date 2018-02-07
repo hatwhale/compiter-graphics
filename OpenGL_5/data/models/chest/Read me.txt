@@ -1,0 +1,14 @@
+Thank you for downloading model by AlpDesing.
+
+You can use this model for anything you want but have in mind that the Textures are from the Internet.
+If you want to edit this model please contact me first!
+
+About the model:
+
+Faces: 839
+Edges: 12
+Materials/Textures: 3
+Available Formats: .fbx .obj .3ds .COLLADA (.dae)
+Time To Make: 120 Minutes
+Size: 44.8 MB
+License: Personal use (Textures are from Internet!)

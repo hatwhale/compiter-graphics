@@ -34,12 +34,12 @@ CFlyingCamera cCamera;
 CDirectionalLight dlSun;
 
 CMaterial matShiny;
-CAssimpModel amModels[3];
+CAssimpModel amModels[5];
 
 CMultiLayeredHeightmap hmWorld;
 
 int iTorusFaces;
-float fRotationAngle = 50.0f;
+float fRotationAngle = 20.0f;
 
 bool bDisplayNormals = false; // Do not display normals by default
 
@@ -106,8 +106,10 @@ void InitScene(LPVOID lpParam)
 
 	amModels[0].LoadModelFromFile("data\\models\\house\\house.3ds");
 	amModels[1].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
-	amModels[2].LoadModelFromFile("data\\models\\skull\\Skull.obj");
-	
+	amModels[2].LoadModelFromFile("data\\models\\chest\\chest.obj");
+	amModels[3].LoadModelFromFile("data\\models\\spider\\spider.obj");
+	amModels[4].LoadModelFromFile("data\\models\\dead_tree\\DeadTree.obj");
+
 	CAssimpModel::FinalizeVBO();
 	CMultiLayeredHeightmap::LoadTerrainShaderProgram();
 	hmWorld.LoadHeightMapFromImage("data\\worlds\\world_like_in_21th.bmp");
@@ -198,14 +200,31 @@ void RenderScene(LPVOID lpParam)
 	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 	amModels[1].RenderModel();
 
-	// ... and another treasure chest
+	// ... and another chest
 
-	mModel = glm::translate(glm::mat4(1.0), glm::vec3(25.0f, 17.5f, -6.0f));
+	mModel = glm::translate(glm::mat4(1.0), glm::vec3(20.0f, 17.5f, -19.0f));
 	mModel = glm::rotate(mModel, -90.0f, glm::vec3(0, 1.0f, 0));
-	mModel = glm::scale(mModel, glm::vec3(0.5f, 0.5f, 0.5f));
+	mModel = glm::scale(mModel, glm::vec3(0.03f, 0.03f, 0.03f));
 
 	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 	amModels[2].RenderModel();
+
+	// ... and spider
+
+	mModel = glm::translate(glm::mat4(1.0), glm::vec3(30.0f, 21.0f, 2.0f));
+	mModel = glm::rotate(mModel, glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+	mModel = glm::scale(mModel, glm::vec3(0.1f, 0.1f, 0.1f));
+
+	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+	amModels[3].RenderModel();
+
+	// ... and dead tree
+
+	mModel = glm::translate(glm::mat4(1.0), glm::vec3(60.0f, 17.5f, 40.0f));
+	mModel = glm::scale(mModel, glm::vec3(6.0f, 6.0f, 6.0f));
+
+	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+	amModels[4].RenderModel();
 
 	// Render 3 rotated tori to create interesting object
 
@@ -302,6 +321,23 @@ void RenderScene(LPVOID lpParam)
 
 		spNormalDisplayer.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 		amModels[2].RenderModel(GL_POINTS);
+
+		// ... and spider again
+
+		mModel = glm::translate(glm::mat4(1.0), glm::vec3(30.0f, 21.0f, 2.0f));
+		mModel = glm::rotate(mModel, glm::radians(180.0f), glm::vec3(0, 1.0f, 0));
+		mModel = glm::scale(mModel, glm::vec3(0.1f, 0.1f, 0.1f));
+
+		spNormalDisplayer.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+		amModels[3].RenderModel(GL_POINTS);
+
+		// ... and dead tree again
+
+		mModel = glm::translate(glm::mat4(1.0), glm::vec3(60.0f, 17.5f, 40.0f));
+		mModel = glm::scale(mModel, glm::vec3(6.0f, 6.0f, 6.0f));
+
+		spNormalDisplayer.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+		amModels[4].RenderModel(GL_POINTS);
 
 		glBindVertexArray(uiVAOSceneObjects);
 
