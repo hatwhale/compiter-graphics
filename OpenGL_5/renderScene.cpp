@@ -291,7 +291,7 @@ void RenderScene(LPVOID lpParam)
 	if(bDisplayNormals)
 	{
 		spNormalDisplayer.UseProgram();
-		spNormalDisplayer.SetUniform("fNormalLength", 1.0f);
+		spNormalDisplayer.SetUniform("fNormalLength", 0.5f);
 		spNormalDisplayer.SetUniform("matrices.projMatrix", oglControl->GetProjectionMatrix());
 		spNormalDisplayer.SetUniform("matrices.viewMatrix", cCamera.Look());
 
@@ -315,9 +315,9 @@ void RenderScene(LPVOID lpParam)
 
 		// ... and another treasure chest again
 
-		mModel = glm::translate(glm::mat4(1.0), glm::vec3(25.0f, 17.5f, -6.0f));
+		mModel = glm::translate(glm::mat4(1.0), glm::vec3(20.0f, 17.5f, -19.0f));
 		mModel = glm::rotate(mModel, -90.0f, glm::vec3(0, 1.0f, 0));
-		mModel = glm::scale(mModel, glm::vec3(0.5f, 0.5f, 0.5f));
+		mModel = glm::scale(mModel, glm::vec3(0.03f, 0.03f, 0.03f));
 
 		spNormalDisplayer.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 		amModels[2].RenderModel(GL_POINTS);
