@@ -166,7 +166,7 @@ void RenderScene(LPVOID lpParam)
 	if(Keys::Key(VK_ADD))fAngleOfDarkness += appMain.sof(90);
 	if(Keys::Key(VK_SUBTRACT))fAngleOfDarkness -= appMain.sof(90);
 	// Set the directional vector of light
-	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*3.1415f/180.0f), -cos(fAngleOfDarkness*3.1415f/180.0f), 0.0f);
+	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*PI/180.0f), -cos(fAngleOfDarkness*PI/180.0f), 0.0f);
 	
 	dlSun.iSkybox = 1;
 	dlSun.SetUniformData(&spMain, "sunLight");
