@@ -27,3 +27,5 @@ using namespace std;
 #define RSFOR(q,s,e) for(int q=s;q>=e;q--)
 
 #define ESZ(elem) (int)elem.size()
+
+const float PI = float(atan(1.0)*4.0);

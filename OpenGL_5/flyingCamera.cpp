@@ -5,13 +5,13 @@
 
 #include <glm/gtx/rotate_vector.hpp>
 
-const float PI = float(atan(1.0)*4.0);
-
 CFlyingCamera::CFlyingCamera()
 {
 	vEye = glm::vec3(0.0f, 0.0f, 0.0f);
 	vView = glm::vec3(0.0f, 0.0, -1.0f);
 	vUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	SetAngleX();
+	SetAngleY();
 	fSpeed = 25.0f;
 	fSensitivity = 0.1f;
 }
@@ -19,6 +19,8 @@ CFlyingCamera::CFlyingCamera()
 CFlyingCamera::CFlyingCamera(glm::vec3 a_vEye, glm::vec3 a_vView, glm::vec3 a_vUp, float a_fSpeed, float a_fSensitivity)
 {
 	vEye = a_vEye; vView = a_vView; vUp = a_vUp;
+	SetAngleX();
+	SetAngleY();
 	fSpeed = a_fSpeed;
 	fSensitivity = a_fSensitivity;
 }
@@ -44,60 +46,53 @@ void CFlyingCamera::RotateWithMouse()
 	float deltaX = (float)(iCentX-pCur.x)*fSensitivity;
 	float deltaY = (float)(iCentY-pCur.y)*fSensitivity;
 
-	if(deltaX != 0.0f)
-	{
-		vView -= vEye;
-		vView = glm::rotate(vView, deltaX, glm::vec3(0.0f, 1.0f, 0.0f));
-		vView += vEye;
-	}
-	if(deltaY != 0.0f)
-	{
-		glm::vec3 vAxis = glm::cross(vView-vEye, vUp);
-		vAxis = glm::normalize(vAxis);
-		float fAngle = deltaY;
-		float fNewAngle = fAngle+GetAngleX();
-		if(fNewAngle > -89.80f && fNewAngle < 89.80f)
-		{
-			vView -= vEye;
-			vView = glm::rotate(vView, deltaY, vAxis);
-			vView += vEye;
-		}
-	}
+	fAngleY -= deltaX;
+	float fNewAngle = fAngleX+deltaY;
+	if(fNewAngle > -89.80f && fNewAngle < 89.80f)
+		fAngleX = fNewAngle;
+
+	vView -= vEye;
+	vView.x = cos(glm::radians(fAngleY)) * cos(glm::radians(fAngleX));
+	vView.y = sin(glm::radians(fAngleX));
+	vView.z = sin(glm::radians(fAngleY)) * cos(glm::radians(fAngleX));
+	vView = glm::normalize(vView);
+	vView += vEye;
+
 	SetCursorPos(iCentX, iCentY);
 }
 
 /*-----------------------------------------------
 
-Name:	GetAngleY
+Name:	SetAngleY
 
 Params:	none
 
-Result:	Gets Y angle of camera (head turning left
+Result:	Sets Y angle of camera (head turning left
 		and right).
 
 /*---------------------------------------------*/
 
-float CFlyingCamera::GetAngleY()
+void CFlyingCamera::SetAngleY()
 {
 	glm::vec3 vDir = vView-vEye; vDir.y = 0.0f;
 	glm::normalize(vDir);
-	float fAngle = acos(glm::dot(glm::vec3(0, 0, -1), vDir))*(180.0f/PI);
-	if(vDir.x < 0)fAngle = 360.0f-fAngle;
-	return fAngle;
+	float fAngle = acos(glm::dot(glm::vec3(-1, 0, 0), vDir))*(180.0f/PI);
+	if(vDir.z < 0)fAngle = 360.0f-fAngle;
+	fAngleY = fAngle;
 }
 
 /*-----------------------------------------------
 
-Name:	GetAngleX
+Name:	SetAngleX
 
 Params:	none
 
-Result:	Gets X angle of camera (head turning up
+Result:	Sets X angle of camera (head turning up
 		and down).
 
 /*---------------------------------------------*/
 
-float CFlyingCamera::GetAngleX()
+void CFlyingCamera::SetAngleX()
 {
 	glm::vec3 vDir = vView-vEye;
 	vDir = glm::normalize(vDir);
@@ -105,7 +100,7 @@ float CFlyingCamera::GetAngleX()
 	vDir2 = glm::normalize(vDir2);
 	float fAngle =  acos(glm::dot(vDir2, vDir))*(180.0f/PI);
 	if(vDir.y < 0)fAngle *= -1.0f;
-	return fAngle;
+	fAngleX = fAngle;
 }
 
 /*-----------------------------------------------
@@ -121,12 +116,13 @@ Result:	Sets Keys for moving camera.
 
 /*---------------------------------------------*/
 
-void CFlyingCamera::SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight)
+void CFlyingCamera::SetMovingKeys(int a_iForw, int a_iBack, int a_iLeft, int a_iRight, int a_SpeedUp)
 {
 	iForw = a_iForw;
 	iBack = a_iBack;
 	iLeft = a_iLeft;
 	iRight = a_iRight;
+	iSpeedUp = a_SpeedUp;
 }
 
 /*-----------------------------------------------
@@ -160,6 +156,7 @@ void CFlyingCamera::Update()
 	if(Keys::Key(iBack))vMoveBy -= vMove*appMain.sof(1.0f);
 	if(Keys::Key(iLeft))vMoveBy -= vStrafe*appMain.sof(1.0f);
 	if(Keys::Key(iRight))vMoveBy += vStrafe*appMain.sof(1.0f);
+	if (Keys::Key(iSpeedUp))vMoveBy *= 2;
 	vEye += vMoveBy; vView += vMoveBy;
 }
 
