@@ -1,3 +1,5 @@
+#pragma comment(lib, "opengl32.lib")
+
 #ifndef OPENGL_H
 #define OPENGL_H
 
