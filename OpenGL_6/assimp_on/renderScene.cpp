@@ -109,7 +109,7 @@ void InitScene(LPVOID lpParam)
 	ftFont.SetShaderProgram(&spFont2D);
 	
 	cCamera = CFlyingCamera(glm::vec3(0.0f, 30.0f, 100.0f), glm::vec3(0.0f, 30.0f, 99.0f), glm::vec3(0.0f, 1.0f, 0.0f), 25.0f, 0.1f);
-	cCamera.SetMovingKeys('W', 'S', 'A', 'D');	
+	cCamera.SetMovingKeys('W', 'S', 'A', 'D', VK_SHIFT);	
 
 	sbMainSkybox.LoadSkybox("data\\skyboxes\\delirious\\", "delirious_front.jpg", "delirious_back.jpg", "delirious_right.jpg", "delirious_left.jpg", "delirious_top.jpg", "delirious_bottom.jpg");
 
