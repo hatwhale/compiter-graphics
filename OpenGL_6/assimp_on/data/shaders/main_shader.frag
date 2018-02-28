@@ -32,7 +32,7 @@ void main()
   float visibility = GetVisibility(shadowMap, ShadowCoord);
 
   vec4 vDiffuseColor = GetDirectionalLightColor(sunLight, vNormalized, visibility);
-  //vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight, vNormalized, visibility);
+  vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight, vNormalized, visibility);
    
-  outputColor = vMixedColor * vDiffuseColor;// + vSpecularColor;
+  outputColor = vMixedColor * (vDiffuseColor + vSpecularColor);
 }

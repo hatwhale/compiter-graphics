@@ -78,7 +78,7 @@ void CSkybox::LoadSkybox(string a_sDirectory, string a_sFront, string a_sBack, s
 	{
 		vboRenderData.AddData(&vSkyBoxVertices[i], sizeof(glm::vec3));
 		vboRenderData.AddData(&vSkyBoxTexCoords[i%4], sizeof(glm::vec2));
-		vboRenderData.AddData(&vSkyBoxNormals[i/4], sizeof(glm::vec3));
+		vboRenderData.AddData(&vSkyBoxVertices[i], sizeof(glm::vec3));
 	}
 
 	vboRenderData.UploadDataToGPU(GL_STATIC_DRAW);

@@ -354,17 +354,17 @@ void RenderScene(LPVOID lpParam)
 
 	// Render skybox
 
-	spSkybox.UseProgram();
+	//spSkybox.UseProgram();
 
-	spSkybox.SetUniform("matrices.projMatrix", oglControl->GetProjectionMatrix());
-	spSkybox.SetUniform("matrices.viewMatrix", cCamera.Look());
-	spSkybox.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::mat4(1.0));
+	//spSkybox.SetUniform("matrices.projMatrix", oglControl->GetProjectionMatrix());
+	//spSkybox.SetUniform("matrices.viewMatrix", cCamera.Look());
+	//spSkybox.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::mat4(1.0));
 
-	spSkybox.SetUniform("vColor", glm::vec4(1, 1, 1, 1));
-	spSkybox.SetUniform("gSampler", 0);	
-	spSkybox.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::translate(glm::mat4(1.0), cCamera.vEye));
+	//spSkybox.SetUniform("vColor", glm::vec4(1, 1, 1, 1));
+	//spSkybox.SetUniform("gSampler", 0);	
+	//spSkybox.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::translate(glm::mat4(1.0), cCamera.vEye));
 
-	sbMainSkybox.RenderSkybox();
+	//sbMainSkybox.RenderSkybox();
 
 	spMain.UseProgram();
 
@@ -386,6 +386,14 @@ void RenderScene(LPVOID lpParam)
 
 	// Set the directional vector of light
 	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*PI/180.0f), -cos(fAngleOfDarkness*PI/180.0f), 0.0f);
+
+	dlSun.iSkybox = 1;
+	dlSun.SetUniformData(&spMain, "sunLight");
+
+	spMain.SetUniform("matrices.modelMatrix", glm::translate(glm::mat4(1.0), cCamera.vEye));
+	sbMainSkybox.RenderSkybox();
+
+	dlSun.iSkybox = 0;
 	dlSun.SetUniformData(&spMain, "sunLight");
 
 	spMain.SetUniform("vEyePosition", cCamera.vEye);

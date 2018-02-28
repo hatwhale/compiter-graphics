@@ -35,7 +35,8 @@ vec4 GetSpecularColor(vec3 vWorldPos, vec3 vEyePos, Material mat, DirectionalLig
 {
    vec4 vResult = vec4(0.0, 0.0, 0.0, 0.0);
    
-   vec3 vReflectedVector = normalize(reflect(dLight.vDirection, vNormal));
+   vec3 vLightDir = dLight.iSkybox == 1 ? -dLight.vDirection : dLight.vDirection;
+   vec3 vReflectedVector = normalize(reflect(vLightDir, normalize(vNormal)));
    vec3 vVertexToEyeVector = normalize(vEyePos-vWorldPos);
    float fSpecularFactor = dot(vVertexToEyeVector, vReflectedVector);
 
