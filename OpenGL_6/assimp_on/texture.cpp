@@ -4,7 +4,11 @@
 
 #include <FreeImage.h>
 
+#ifdef _DEBUG
+#pragma comment(lib, "FreeImaged.lib")
+#else
 #pragma comment(lib, "FreeImage.lib")
+#endif
 
 CTexture::CTexture()
 {
