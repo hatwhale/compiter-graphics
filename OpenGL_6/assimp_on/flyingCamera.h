@@ -4,6 +4,8 @@ class CFlyingCamera
 {
 public:
 	glm::vec3 vEye, vView, vUp;
+	float fAngleX; //X angle of camera (head turning up and down)
+	float fAngleY; //Y angle of camera (head turning left and right)
 	float fSpeed;
 	float fSensitivity; // How many degrees to rotate per pixel moved by mouse (nice value is 0.10)
 
@@ -16,7 +18,7 @@ public:
 	void ResetMouse();
 
 	// Functions that get viewing angles
-	float GetAngleX(), GetAngleY();
+	void SetAngleX(), SetAngleY();
 
 	// Constructors
 	CFlyingCamera();
