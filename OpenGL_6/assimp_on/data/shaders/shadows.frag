@@ -9,7 +9,7 @@ float GetVisibility(sampler2D shadowMap, vec4 vShadowCoord);
 uniform sampler2D rotationTexture;
 
 uniform float scale, radius;
-uniform int bShadowsOn;
+uniform bool bShadowsOn;
 
 vec2 poissonDisk[16] = vec2[]( 
    vec2( -0.94201624, -0.39906216 ), 
@@ -34,7 +34,7 @@ float GetVisibility(sampler2D shadowMap, vec4 vShadowCoord)
 {
     float visibility = 1.0;
     
-    if(bShadowsOn == 1)
+    if(bShadowsOn)
     {
 		visibility = 0.0;
 

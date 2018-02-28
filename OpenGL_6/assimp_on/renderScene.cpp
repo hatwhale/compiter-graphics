@@ -405,7 +405,7 @@ void RenderScene(LPVOID lpParam)
 	// You can use whichever texture unit you want, I used 5 because of 5 textures in terrain and 6th first available
 	spMain.SetUniform("shadowMap", 5);
 	fboShadowMap.BindFramebufferTexture(5, false);
-	spMain.SetUniform("bShadowsOn", bShadowsOn ? 1 : 0);
+	spMain.SetUniform("bShadowsOn", bShadowsOn);
 	spMain.SetUniform("rotationTexture", 6);
 	rotationTexture.BindTexture(6);
 	spMain.SetUniform("scale", 1.0f / 64.0f);
@@ -502,7 +502,7 @@ void RenderScene(LPVOID lpParam)
 
 	spMD2Animation.SetUniform("shadowMap", 5);
 	fboShadowMap.BindFramebufferTexture(5, false);
-	spMD2Animation.SetUniform("bShadowsOn", 1);
+	spMD2Animation.SetUniform("bShadowsOn", bShadowsOn);
 	spMD2Animation.SetUniform("rotationTexture", 6);
 	rotationTexture.BindTexture(6);
 	spMD2Animation.SetUniform("scale", 1.0f / 64.0f);
@@ -524,7 +524,7 @@ void RenderScene(LPVOID lpParam)
 
 	spTerrain->SetUniform("shadowMap", 5);	
 	fboShadowMap.BindFramebufferTexture(5, false);
-	spTerrain->SetUniform("bShadowsOn", 1);
+	spTerrain->SetUniform("bShadowsOn", bShadowsOn);
 	spTerrain->SetUniform("rotationTexture", 6);
 	rotationTexture.BindTexture(6);
 	spTerrain->SetUniform("scale", 1.0f / 64.0f);

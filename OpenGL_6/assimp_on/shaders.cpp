@@ -487,6 +487,14 @@ void CShaderProgram::SetUniform(string sName, const int iValue)
 	glUniform1i(iLoc, iValue);
 }
 
+// Setting bools
+
+void CShaderProgram::SetUniform(string sName, const bool bValue)
+{
+	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
+	glUniform1i(iLoc, bValue);
+}
+
 void CShaderProgram::SetModelAndNormalMatrix(string sModelMatrixName, string sNormalMatrixName, glm::mat4 mModelMatrix)
 {
 	SetUniform(sModelMatrixName, mModelMatrix);
