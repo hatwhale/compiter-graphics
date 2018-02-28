@@ -5,8 +5,6 @@
 
 #include <glm/gtx/rotate_vector.hpp>
 
-const float PI = float(atan(1.0)*4.0);
-
 CFlyingCamera::CFlyingCamera()
 {
 	vEye = glm::vec3(0.0f, 0.0f, 0.0f);

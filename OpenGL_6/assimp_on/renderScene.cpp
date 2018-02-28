@@ -312,8 +312,8 @@ void RenderScene(LPVOID lpParam)
 		// Render extra arrow that shows direction of light
 
 		mModel = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 80.0f, 0.0f));
-		mModel = glm::rotate(mModel, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		mModel = glm::rotate(mModel, -fAngleOfDarkness, glm::vec3(0.0f, 1.0f, 0.0f));
+		mModel = glm::rotate(mModel, PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
+		mModel = glm::rotate(mModel, -fAngleOfDarkness*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		mModel = glm::scale(mModel, glm::vec3(20.0f, 20.0f, 10.0f));
 
 		depthMVP = mPROJ * mViewFromLight * mModel;
@@ -385,7 +385,7 @@ void RenderScene(LPVOID lpParam)
 	if(fAngleOfDarkness > 90.0f) fAngleOfDarkness = 90.0f;
 
 	// Set the directional vector of light
-	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*3.1415f/180.0f), -cos(fAngleOfDarkness*3.1415f/180.0f), 0.0f);
+	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*PI/180.0f), -cos(fAngleOfDarkness*PI/180.0f), 0.0f);
 	dlSun.SetUniformData(&spMain, "sunLight");
 
 	spMain.SetUniform("vEyePosition", cCamera.vEye);
@@ -465,7 +465,7 @@ void RenderScene(LPVOID lpParam)
 
 	mModel = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 80.0f, 0.0f));
 	mModel = glm::rotate(mModel, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	mModel = glm::rotate(mModel, -fAngleOfDarkness, glm::vec3(0.0f, 1.0f, 0.0f));
+	mModel = glm::rotate(mModel, -fAngleOfDarkness * PI / 180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	mModel = glm::scale(mModel, glm::vec3(20.0f, 20.0f, 10.0f));
 
 	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
