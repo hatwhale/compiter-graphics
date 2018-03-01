@@ -12,7 +12,8 @@ uniform vec4 vColor;
 
 #include "dirLight.frag"
 
-uniform DirectionalLight sunLight[iLightCount];
+uniform DirectionalLight sunLight[LIGHT_MAX];
+uniform int iLightCount;
 uniform float fRenderHeight;
 uniform float fMaxTextureU;
 uniform float fMaxTextureV;
@@ -23,7 +24,7 @@ uniform Material matActive;
 
 #include "shadows.frag"
 
-smooth in vec4 ShadowCoord[iLightCount];
+smooth in vec4 ShadowCoord[LIGHT_MAX];
 
 void main()
 {
@@ -73,14 +74,17 @@ void main()
 
 	vec4 vMixedColor = vFinalTexColor*vColor;
 
-	int l_i = 0;
+	outputColor = vec4(0.0f);
+	for(int l_i = 0; l_i < min(iLightCount, LIGHT_MAX); l_i++)
+	{
+		vec4 vShadowCoord = ShadowCoord[l_i];
+		vShadowCoord /= vShadowCoord.w; vShadowCoord.q = l_i;
+		float visibility = GetVisibility(shadowMap, vShadowCoord);
+		if(sunLight[l_i].bSkybox)visibility = 0.0f;
 
-	vec4 vShadowCoord = ShadowCoord[l_i]; 
-	vShadowCoord /= vShadowCoord.w; vShadowCoord.q = l_i;
-	float visibility = GetVisibility(shadowMap, vShadowCoord);
-
-	vec4 vDirLightColor = GetDirectionalLightColor(sunLight[l_i], vNormal, visibility);
-	//vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight[l_i], vNormalized, visibility);
-	
-	outputColor = vMixedColor * vDirLightColor;// + vSpecularColor;
+		vec4 vDirLightColor = GetDirectionalLightColor(sunLight[l_i], vNormal, visibility);
+		//vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight[l_i], vNormalized, visibility);
+		if(sunLight[l_i].bSwitch)outputColor += vDirLightColor;// + vSpecularColor;
+	}
+	outputColor *= vMixedColor;
 }                      

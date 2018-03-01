@@ -31,9 +31,9 @@ CFreeTypeFont ftFont;
 CSkybox sbMainSkybox;
 CFlyingCamera cCamera;
 
-const int iLightCount = 2;
+const int iLightCount = 3;
 CDirectionalLight dlSun[iLightCount];
-float fAngleOfDarkness[iLightCount];
+glm::vec2 fAngleOfDarkness[iLightCount];
 int iLightChoice = 0;
 
 CMaterial matShiny;
@@ -116,14 +116,14 @@ void InitScene(LPVOID lpParam)
 
 	sbMainSkybox.LoadSkybox("data\\skyboxes\\delirious\\", "delirious_front.jpg", "delirious_back.jpg", "delirious_right.jpg", "delirious_left.jpg", "delirious_top.jpg", "delirious_bottom.jpg");
 
-	dlSun[0] = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f)/2, -sqrt(2.0f)/2, 0), 0.5f, 0);
-	dlSun[1] = CDirectionalLight(glm::vec3(1.0f, 0.8f, 0.8f), glm::vec3(1, 0, 0), 0.3f, 0);
-	//dlSun[2] = CDirectionalLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0, 1, 0), 0.1f, 0);
+	dlSun[0] = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.3f);
+	dlSun[1] = CDirectionalLight(glm::vec3(1.0f, 0.5f, 0.5f), 0.1f);
+	dlSun[2] = CDirectionalLight(glm::vec3(0.5f, 1.0f, 0.5f), 0.1f);
 
 	// This values set the darkness of whole scene (direction of light), that's why such name of variable :D
-	fAngleOfDarkness[0] = 45.0f;
-	fAngleOfDarkness[1] = -45.0f;
-	//fAngleOfDarkness[2] = 45.0f;
+	fAngleOfDarkness[0] = glm::vec2(45.0f, 90.0f);
+	fAngleOfDarkness[1] = glm::vec2(-45.0f, -90.0f);
+	fAngleOfDarkness[2] = glm::vec2(90.0f, 0.0f);
 
 	amModels[0].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
 	amModels[1].LoadModelFromFile("data\\models\\Arrow\\Arrow.obj");
@@ -141,7 +141,7 @@ void InitScene(LPVOID lpParam)
 
 
 	psMainParticleSystem.SetGeneratorProperties(
-		glm::vec3(-98.76f, 43.02f, 1.34f), // Where the particles are generated
+		glm::vec3(-97.87f, 43.02f, 3.27f), // Where the particles are generated
 		glm::vec3(-10, 0, -10), // Minimal velocity
 		glm::vec3(10, 20, 10), // Maximal velocity
 		glm::vec3(0, -20, 0), // Gravity force applied to particles
@@ -250,6 +250,7 @@ void RenderScene(LPVOID lpParam)
 			mDepthBiasMVP[l_i] = mPROJ * mViewFromLight;
 		}
 		spShadowMapper.SetUniform("depthMV", mDepthBiasMVP, iLightCount);
+		spShadowMapper.SetUniform("iLightCount", iLightCount);
 
 		glm::mat4 biasMatrix(
 			0.5, 0.0, 0.0, 0.0,
@@ -317,7 +318,8 @@ void RenderScene(LPVOID lpParam)
 
 		mModel = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 80.0f, 0.0f));
 		mModel = glm::rotate(mModel, PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
-		mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice]*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice].x*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice].y*PI/180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 		mModel = glm::scale(mModel, glm::vec3(20.0f, 20.0f, 10.0f));
 
 		spShadowMapper.SetUniform("mModel", mModel);
@@ -364,6 +366,8 @@ void RenderScene(LPVOID lpParam)
 
 	spMain.UseProgram();
 
+	spMain.SetUniform("iLightCount", iLightCount);
+
 	spMain.SetUniform("matrices.projMatrix", oglControl->GetProjectionMatrix());
 	spMain.SetUniform("matrices.viewMatrix", cCamera.Look());
 
@@ -374,17 +378,22 @@ void RenderScene(LPVOID lpParam)
 	spMain.SetUniform("vColor", glm::vec4(1, 1, 1, 1));
 
 	// You can play with direction of light with '+' and '-' key
-	if(Keys::Key(VK_ADD))fAngleOfDarkness[iLightChoice] += appMain.sof(90);
-	if(Keys::Key(VK_SUBTRACT))fAngleOfDarkness[iLightChoice] -= appMain.sof(90);
+	if(Keys::Key(VK_ADD))fAngleOfDarkness[iLightChoice].x += appMain.sof(90);
+	if(Keys::Key(VK_SUBTRACT))fAngleOfDarkness[iLightChoice].x -= appMain.sof(90);
+	if (Keys::Key(VK_MULTIPLY))fAngleOfDarkness[iLightChoice].y += appMain.sof(90);
+	if (Keys::Key(VK_DIVIDE))fAngleOfDarkness[iLightChoice].y -= appMain.sof(90);
 
-	if(fAngleOfDarkness[iLightChoice] < -90.0f) fAngleOfDarkness[iLightChoice] = -90.0f;
-	if(fAngleOfDarkness[iLightChoice] > 90.0f) fAngleOfDarkness[iLightChoice] = 90.0f;
+	if(fAngleOfDarkness[iLightChoice].x < -90.0f) fAngleOfDarkness[iLightChoice].x = -90.0f;
+	if(fAngleOfDarkness[iLightChoice].x > 90.0f) fAngleOfDarkness[iLightChoice].x = 90.0f;
 
 	FOR(l_i, iLightCount)
 	{
+		//dlSun[l_i].vDirection = dlSun[l_i].vDirection = glm::vec3(-sin(fAngleOfDarkness[l_i].x * PI / 180.0f), -cos(fAngleOfDarkness[l_i].x * PI / 180.0f), 0.0f);
 		// Set the directional vector of light
-		dlSun[l_i].vDirection = glm::vec3(-sin(fAngleOfDarkness[l_i]*PI / 180.0f), -cos(fAngleOfDarkness[l_i] *PI / 180.0f), 0.0f);
-		dlSun[l_i].iSkybox = 1;
+		dlSun[l_i].vDirection = glm::vec3(-sin(fAngleOfDarkness[l_i].x*PI/180.0f)*cos(fAngleOfDarkness[l_i].y*PI/180.0f),
+										  -cos(fAngleOfDarkness[l_i].x*PI/180.0f)*cos(fAngleOfDarkness[l_i].y*PI/180.0f),
+										  sin(fAngleOfDarkness[l_i].y*PI/180.0f));
+		dlSun[l_i].bSkybox = true;
 		dlSun[l_i].SetUniformData(&spMain, "sunLight", l_i);
 	}
 
@@ -393,7 +402,7 @@ void RenderScene(LPVOID lpParam)
 
 	FOR(l_i, iLightCount)
 	{
-		dlSun[l_i].iSkybox = 0;
+		dlSun[l_i].bSkybox = false;
 		dlSun[l_i].SetUniformData(&spMain, "sunLight", l_i);
 	}
 
@@ -474,7 +483,8 @@ void RenderScene(LPVOID lpParam)
 
 	mModel = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 80.0f, 0.0f));
 	mModel = glm::rotate(mModel, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice]*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice].x*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice].y*PI/180.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 	mModel = glm::scale(mModel, glm::vec3(20.0f, 20.0f, 10.0f));
 
 	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
@@ -483,6 +493,7 @@ void RenderScene(LPVOID lpParam)
 	// Render Hobo Goblin
 
 	spMD2Animation.UseProgram();
+	spMD2Animation.SetUniform("iLightCount", iLightCount);
 	spMD2Animation.SetUniform("matrices.projMatrix", oglControl->GetProjectionMatrix());
 	spMD2Animation.SetUniform("matrices.viewMatrix", cCamera.Look());
 
@@ -517,7 +528,8 @@ void RenderScene(LPVOID lpParam)
 	CShaderProgram* spTerrain = CMultiLayeredHeightmap::GetShaderProgram();
 
 	spTerrain->UseProgram();
-
+	
+	spTerrain->SetUniform("iLightCount", iLightCount);
 	spTerrain->SetUniform("matrices.projMatrix", oglControl->GetProjectionMatrix());
 	spTerrain->SetUniform("matrices.viewMatrix", cCamera.Look());
 
