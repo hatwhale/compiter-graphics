@@ -148,8 +148,8 @@ Result:	Binds framebuffer texture, where renderings
 
 void CFramebuffer::BindFramebufferTexture(int iTextureUnit, bool bRegenMipMaps)
 {
-	tFramebufferTex.BindTexture(iTextureUnit);
-	if(bRegenMipMaps)glGenerateMipmap(GL_TEXTURE_2D);
+	tFramebufferTex.BindTextureArray(iTextureUnit);
+	if(bRegenMipMaps)glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 /*-----------------------------------------------

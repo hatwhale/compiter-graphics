@@ -21,6 +21,7 @@ public:
 
 	bool LoadTexture2D(string a_sPath);
 	void BindTexture(int iTextureUnit = 0);
+	void BindTextureArray(int iTextureUnit = 0);
 
 	UINT GetTextureID();
 

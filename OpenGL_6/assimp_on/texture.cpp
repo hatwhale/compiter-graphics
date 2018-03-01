@@ -200,6 +200,12 @@ void CTexture::BindTexture(int iTextureUnit)
 	glBindTexture(GL_TEXTURE_2D, uiTexture);
 }
 
+void CTexture::BindTextureArray(int iTextureUnit)
+{
+	glActiveTexture(GL_TEXTURE0 + iTextureUnit);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, uiTexture);
+}
+
 void CTexture::DeleteTexture()
 {
 	glDeleteTextures(1, &uiTexture);

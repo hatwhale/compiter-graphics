@@ -30,15 +30,15 @@ void main()
   vec3 vNormalized = normalize(vNormal);
 
   int l_i = 0;
+  for(int l_i = 0; l_i < iLightCount; l_i++)
+  {
+	vec4 vShadowCoord = ShadowCoord[l_i];
+	vShadowCoord /= vShadowCoord.w; vShadowCoord.q = l_i;
+	float visibility = GetVisibility(shadowMap, vShadowCoord);
 
-  vec4 vShadowCoord = ShadowCoord[l_i];
-  vShadowCoord /= vShadowCoord.w; vShadowCoord.q = l_i;
-  float visibility = GetVisibility(shadowMap, vShadowCoord);
-
-  vec4 vDiffuseColor = GetDirectionalLightColor(sunLight[l_i], vNormalized, visibility);
-  vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight[l_i], vNormalized, visibility);
+	vec4 vDiffuseColor = GetDirectionalLightColor(sunLight[l_i], vNormalized, visibility);
+	vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight[l_i], vNormalized, visibility);
+  }
 
   outputColor = vMixedColor * (vDiffuseColor + vSpecularColor);
-  //float depth = texture(shadowMap, vec3(vShadowCoord.xy, 0.0)).r;
-  //outputColor = vec4(depth, depth, depth, 1.0);
 }
