@@ -1,6 +1,8 @@
 #ifndef OPENGL_H
 #define OPENGL_H
 
+#pragma comment(lib, "opengl32.lib")
+
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
 
