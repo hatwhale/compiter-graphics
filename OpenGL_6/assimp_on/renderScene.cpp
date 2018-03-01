@@ -594,7 +594,7 @@ void RenderScene(LPVOID lpParam)
 	ftFont.PrintFormatted(20, h-155, 20, "Move with arrow keys, shoot with SPACE ;)");
 	ftFont.PrintFormatted(20, h-180, 20, "Use + and - to play with direction of light");
 	ftFont.PrintFormatted(20, h-205, 20, "(the arrow in the sky shows direction of light)");
-	ftFont.PrintFormatted(20, h-230, 20, "Light Choice: %d", iLightChoice);
+	ftFont.PrintFormatted(20, h-230, 20, "Light Source [%d]: 'E' to switch %s", iLightChoice, dlSun[iLightChoice].bSwitch ? "off" : "on");
 
 	if(bDisplayShadowMap)
 	{
@@ -667,6 +667,7 @@ void RenderScene(LPVOID lpParam)
 
 	if(Keys::Onekey('R'))bShadowsOn = !bShadowsOn;
 	if(Keys::Onekey('M'))bDisplayShadowMap = !bDisplayShadowMap;
+	if (Keys::Onekey('E'))dlSun[iLightChoice].bSwitch = !dlSun[iLightChoice].bSwitch;
 	if(Keys::Onekey(VK_TAB))iLightChoice = (iLightChoice+1)%iLightCount;
 
 	bool bRecreate = false;
