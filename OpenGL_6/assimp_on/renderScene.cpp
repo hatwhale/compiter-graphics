@@ -31,9 +31,10 @@ CFreeTypeFont ftFont;
 CSkybox sbMainSkybox;
 CFlyingCamera cCamera;
 
-const int iLightCount = 3;
-CDirectionalLight dlSun[iLightCount];
-glm::vec2 fAngleOfDarkness[iLightCount];
+const int LIGHT_MAX = 10;
+int iLightCount = 3;
+CDirectionalLight dlSun[LIGHT_MAX];
+glm::vec2 fAngleOfDarkness[LIGHT_MAX];
 int iLightChoice = 0;
 
 CMaterial matShiny;
@@ -225,7 +226,7 @@ void RenderScene(LPVOID lpParam)
 	// Typecast lpParam to COpenGLControl pointer
 	COpenGLControl* oglControl = (COpenGLControl*)lpParam;
 
-	glm::mat4 mDepthBiasMVP[iLightCount];
+	glm::mat4 mDepthBiasMVP[LIGHT_MAX];
 	glm::mat4 mModel;
 
 	if(bShadowsOn) // So if the shadows are on
@@ -245,6 +246,7 @@ void RenderScene(LPVOID lpParam)
 		{
 			const float fRangeX = 150, fRangeY = 150, fMinZ = 0.125f, fMaxZ = 512;
 			glm::mat4 mPROJ = glm::ortho<float>(-fRangeX, fRangeX, -fRangeY, fRangeY, fMinZ, fMaxZ);
+			//glm::mat4 mPROJ = *oglControl->GetProjectionMatrix();
 			glm::vec3 vLightPos = -dlSun[l_i].vDirection*256.0f;
 			glm::mat4 mViewFromLight = glm::lookAt(vLightPos, glm::vec3(0, 0, 0), glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), dlSun[l_i].vDirection));
 			mDepthBiasMVP[l_i] = mPROJ * mViewFromLight;
@@ -592,9 +594,9 @@ void RenderScene(LPVOID lpParam)
 	ftFont.PrintFormatted(20, h-105, 20, "Shadow Map Texture Size: %dx%d (Change with PGUP and PGDN)", iShadowMapTextureSize, iShadowMapTextureSize);
 
 	ftFont.PrintFormatted(20, h-155, 20, "Move with arrow keys, shoot with SPACE ;)");
-	ftFont.PrintFormatted(20, h-180, 20, "Use + and - to play with direction of light");
+	ftFont.PrintFormatted(20, h-180, 20, "Use +- and */ to play with y- and x- directions of light");
 	ftFont.PrintFormatted(20, h-205, 20, "(the arrow in the sky shows direction of light)");
-	ftFont.PrintFormatted(20, h-230, 20, "Light Source [%d]: 'E' to switch %s", iLightChoice, dlSun[iLightChoice].bSwitch ? "off" : "on");
+	ftFont.PrintFormatted(20, h-230, 20, "Light Source [%d]: %s ('E' to toggle)", iLightChoice, dlSun[iLightChoice].bSwitch ? "On" : "Off");
 
 	if(bDisplayShadowMap)
 	{
@@ -671,6 +673,17 @@ void RenderScene(LPVOID lpParam)
 	if(Keys::Onekey(VK_TAB))iLightChoice = (iLightChoice+1)%iLightCount;
 
 	bool bRecreate = false;
+	if (Keys::Onekey(VK_RETURN))
+	{
+		iLightCount = min(iLightCount + 1, LIGHT_MAX);
+		bRecreate = true;
+	}
+	if (bRecreate && iLightCount != LIGHT_MAX)
+	{
+		dlSun[iLightCount - 1] = CDirectionalLight(glm::vec3(0.5f, 0.5f, 0.5f), 0.1f);
+		fAngleOfDarkness[iLightCount - 1] = glm::vec2(45.0f, 0.0f);
+	}
+
 	if(Keys::Onekey(VK_PRIOR))
 	{
 		iShadowMapTextureSize <<= 1;

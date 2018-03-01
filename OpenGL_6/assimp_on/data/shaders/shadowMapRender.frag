@@ -9,7 +9,7 @@ uniform int layer;
 
 void main()
 {
-	float depth = texture(shadowMap, vec3(vCoord, layer)).r;
+	float depth = 1.0 - texture(shadowMap, vec3(vCoord, layer)).r;
 
 	outputColor = vec4(depth, depth, depth, 1.0);
 }
