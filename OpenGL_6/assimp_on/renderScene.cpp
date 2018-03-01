@@ -680,7 +680,9 @@ void RenderScene(LPVOID lpParam)
 	}
 	if (bRecreate && iLightCount != LIGHT_MAX)
 	{
-		dlSun[iLightCount - 1] = CDirectionalLight(glm::vec3(0.5f, 0.5f, 0.5f), 0.1f);
+		glm::vec3 color = glm::vec3(0.2f, 0.2f, 0.2f);
+		color[(iLightCount + 1)%3] += 0.3f;
+		dlSun[iLightCount - 1] = CDirectionalLight(color, 0.1f);
 		fAngleOfDarkness[iLightCount - 1] = glm::vec2(45.0f, 0.0f);
 	}
 
