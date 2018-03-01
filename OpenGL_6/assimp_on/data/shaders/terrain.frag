@@ -6,13 +6,13 @@ smooth in vec3 vWorldPos;
 smooth in vec4 vEyeSpacePos;
 
 uniform sampler2D gSampler[5];
-uniform sampler2D shadowMap;
+uniform sampler2DArray shadowMap;
 
 uniform vec4 vColor;
 
 #include "dirLight.frag"
 
-uniform DirectionalLight sunLight;
+uniform DirectionalLight sunLight[iLightCount];
 uniform float fRenderHeight;
 uniform float fMaxTextureU;
 uniform float fMaxTextureV;
@@ -23,7 +23,7 @@ uniform Material matActive;
 
 #include "shadows.frag"
 
-smooth in vec4 ShadowCoord;
+smooth in vec4 ShadowCoord[iLightCount];
 
 void main()
 {
@@ -73,10 +73,14 @@ void main()
 
 	vec4 vMixedColor = vFinalTexColor*vColor;
 
-	float visibility = GetVisibility(shadowMap, ShadowCoord);
+	int l_i = 0;
 
-	vec4 vDirLightColor = GetDirectionalLightColor(sunLight, vNormal, visibility);
-	//vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight, vNormalized, visibility);
+	vec4 vShadowCoord = ShadowCoord[l_i]; 
+	vShadowCoord /= vShadowCoord.w; vShadowCoord.q = l_i;
+	float visibility = GetVisibility(shadowMap, vShadowCoord);
+
+	vec4 vDirLightColor = GetDirectionalLightColor(sunLight[l_i], vNormal, visibility);
+	//vec4 vSpecularColor = GetSpecularColor(vWorldPos, vEyePosition, matActive, sunLight[l_i], vNormalized, visibility);
 	
 	outputColor = vMixedColor * vDirLightColor;// + vSpecularColor;
 }                      

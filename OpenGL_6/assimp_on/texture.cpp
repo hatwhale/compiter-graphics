@@ -55,6 +55,17 @@ void CTexture::CreateDepthTexture(int a_iWidth, int a_iHeight)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, a_iWidth, a_iHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 }
 
+void CTexture::CreateDepthTexture(int a_iWidth, int a_iHeight, int a_iDepth)
+{
+	glGenTextures(1, &uiTexture);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, uiTexture);
+
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	FOR(l_i, a_iDepth) glTexImage3D(GL_TEXTURE_2D_ARRAY, l_i, GL_DEPTH_COMPONENT24, a_iWidth, a_iHeight, a_iDepth, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+}
+
 void CTexture::CreateRotationTexture(int a_iWidth, int a_iHeight)
 {
 	glGenTextures(1, &uiTexture);

@@ -2,6 +2,8 @@
 
 #include_part
 
+const int iLightCount = 2;
+
 struct DirectionalLight
 {
 	vec3 vColor;

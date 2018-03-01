@@ -21,6 +21,7 @@ public:
 	int iSkybox;
 
 	void SetUniformData(CShaderProgram* spProgram, string sLightVarName);
+	void SetUniformData(CShaderProgram* spProgram, string sLightVarName, int index);
 
 	CDirectionalLight();
 	CDirectionalLight(glm::vec3 a_vColor, glm::vec3 a_vDirection, float a_fAmbient, int a_iSkybox);

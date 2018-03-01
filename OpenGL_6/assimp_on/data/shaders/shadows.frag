@@ -2,7 +2,7 @@
 
 #include_part
 
-float GetVisibility(sampler2D shadowMap, vec4 vShadowCoord);
+float GetVisibility(sampler2DArray shadowMap, vec4 vShadowCoord);
 
 #definition_part
 
@@ -30,7 +30,7 @@ vec2 poissonDisk[16] = vec2[](
    vec2( 0.14383161, -0.14100790 ) 
 );
 
-float GetVisibility(sampler2D shadowMap, vec4 vShadowCoord)
+float GetVisibility(sampler2DArray shadowMap, vec4 vShadowCoord)
 {
     float visibility = 1.0;
     
@@ -40,15 +40,13 @@ float GetVisibility(sampler2D shadowMap, vec4 vShadowCoord)
 
 		float bias = 0.005;
 
-		vShadowCoord /= vShadowCoord.w;
-
 		vec4 srv = (texture(rotationTexture, gl_FragCoord.st * scale) * 2.0 - 1.0) * radius;
 
 		mat2x2 srm = mat2x2(srv.xy, srv.zw);
 
 		for(int i = 0; i < 16; i++)
 		{
-			float depth = texture(shadowMap, vShadowCoord.st + srm * poissonDisk[i]).r; 
+			float depth = texture(shadowMap, vShadowCoord.stq + vec3(srm * poissonDisk[i], 0.0)).r; 
 		
 			if(vShadowCoord.z - bias < depth)
 			{

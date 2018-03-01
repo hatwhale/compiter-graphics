@@ -164,6 +164,7 @@
     <None Include="data\shaders\particles_update.geom" />
     <None Include="data\shaders\particles_update.vert" />
     <None Include="data\shaders\shadowMapper.frag" />
+    <None Include="data\shaders\shadowMapper.geom" />
     <None Include="data\shaders\shadowMapper.vert" />
     <None Include="data\shaders\shadowMapRender.frag" />
     <None Include="data\shaders\shadowMapRender.vert" />

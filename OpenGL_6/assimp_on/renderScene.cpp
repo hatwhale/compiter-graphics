@@ -31,7 +31,10 @@ CFreeTypeFont ftFont;
 CSkybox sbMainSkybox;
 CFlyingCamera cCamera;
 
-CDirectionalLight dlSun;
+const int iLightCount = 2;
+CDirectionalLight dlSun[iLightCount];
+float fAngleOfDarkness[iLightCount];
+int iLightChoice = 0;
 
 CMaterial matShiny;
 CAssimpModel amModels[4];
@@ -113,7 +116,14 @@ void InitScene(LPVOID lpParam)
 
 	sbMainSkybox.LoadSkybox("data\\skyboxes\\delirious\\", "delirious_front.jpg", "delirious_back.jpg", "delirious_right.jpg", "delirious_left.jpg", "delirious_top.jpg", "delirious_bottom.jpg");
 
-	dlSun = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f)/2, -sqrt(2.0f)/2, 0), 0.5f, 0);
+	dlSun[0] = CDirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(sqrt(2.0f)/2, -sqrt(2.0f)/2, 0), 0.5f, 0);
+	dlSun[1] = CDirectionalLight(glm::vec3(1.0f, 0.8f, 0.8f), glm::vec3(1, 0, 0), 0.3f, 0);
+	//dlSun[2] = CDirectionalLight(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0, 1, 0), 0.1f, 0);
+
+	// This values set the darkness of whole scene (direction of light), that's why such name of variable :D
+	fAngleOfDarkness[0] = 45.0f;
+	fAngleOfDarkness[1] = -45.0f;
+	//fAngleOfDarkness[2] = 45.0f;
 
 	amModels[0].LoadModelFromFile("data\\models\\treasure_chest_obj\\treasure_chest.obj");
 	amModels[1].LoadModelFromFile("data\\models\\Arrow\\Arrow.obj");
@@ -179,7 +189,7 @@ void InitScene(LPVOID lpParam)
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec3)+sizeof(glm::vec2), (void*)sizeof(glm::vec3));
 
-	fboShadowMap.CreateFrameBufferForDepthShadow(iShadowMapTextureSize, iShadowMapTextureSize);
+	fboShadowMap.CreateFrameBufferForDepthShadow(iShadowMapTextureSize, iShadowMapTextureSize, iLightCount);
 
 	rotationTexture.CreateRotationTexture(64, 64);
 
@@ -215,10 +225,7 @@ void RenderScene(LPVOID lpParam)
 	// Typecast lpParam to COpenGLControl pointer
 	COpenGLControl* oglControl = (COpenGLControl*)lpParam;
 
-	// This values set the darkness of whole scene (direction of light), that's why such name of variable :D
-	static float fAngleOfDarkness = 45.0f;
-
-	glm::mat4 mDepthBiasMVP;
+	glm::mat4 mDepthBiasMVP[iLightCount];
 	glm::mat4 mModel;
 
 	if(bShadowsOn) // So if the shadows are on
@@ -234,20 +241,25 @@ void RenderScene(LPVOID lpParam)
 
 		// Because we have a directional light, we just set it high enough (vLightPos) so that it sees all objects on scene
 		// We also create orthographics projection matrix for the purposes of rendering shadows
-		const float fRangeX = 150, fRangeY = 150, fMinZ = 0.125f, fMaxZ = 512;
-		glm::mat4 mPROJ = glm::ortho<float>(-fRangeX, fRangeX, -fRangeY, fRangeY, fMinZ, fMaxZ);
-		glm::vec3 vLightPos = -dlSun.vDirection*256.0f;
-		glm::mat4 mViewFromLight = glm::lookAt(vLightPos, glm::vec3(0,0,0), glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), dlSun.vDirection));
+		FOR(l_i, iLightCount)
+		{
+			const float fRangeX = 150, fRangeY = 150, fMinZ = 0.125f, fMaxZ = 512;
+			glm::mat4 mPROJ = glm::ortho<float>(-fRangeX, fRangeX, -fRangeY, fRangeY, fMinZ, fMaxZ);
+			glm::vec3 vLightPos = -dlSun[l_i].vDirection*256.0f;
+			glm::mat4 mViewFromLight = glm::lookAt(vLightPos, glm::vec3(0, 0, 0), glm::cross(glm::vec3(0.0f, 0.0f, -1.0f), dlSun[l_i].vDirection));
+			mDepthBiasMVP[l_i] = mPROJ * mViewFromLight;
+		}
+		spShadowMapper.SetUniform("depthMV", mDepthBiasMVP, iLightCount);
 
 		glm::mat4 biasMatrix(
-			0.5, 0.0, 0.0, 0.0, 
+			0.5, 0.0, 0.0, 0.0,
 			0.0, 0.5, 0.0, 0.0,
 			0.0, 0.0, 0.5, 0.0,
 			0.5, 0.5, 0.5, 1.0
-			);
+		);
 
 		// Calculate depth bias matrix to calculate shadow coordinates in shader programs
-		mDepthBiasMVP = biasMatrix * mPROJ * mViewFromLight;
+		FOR(l_i, iLightCount) mDepthBiasMVP[l_i] = biasMatrix * mDepthBiasMVP[l_i];
 
 		CAssimpModel::BindModelsVAO();
 
@@ -255,10 +267,8 @@ void RenderScene(LPVOID lpParam)
 
 		mModel = glm::translate(glm::mat4(1.0), glm::vec3(-97.87f, 25.15f, 3.27f));
 		mModel = glm::scale(mModel, glm::vec3(0.5f, 0.5f, 0.5f));
-
-		spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
-		glm::mat4 depthMVP = mPROJ * mViewFromLight * mModel;
-		spShadowMapper.SetUniform("depthMVP", depthMVP);
+		
+		spShadowMapper.SetUniform("mModel", mModel);
 		amModels[2].RenderModel();
 
 		// Render some pillars
@@ -270,9 +280,7 @@ void RenderScene(LPVOID lpParam)
 
 			mModel = glm::translate(glm::mat4(1.0), vPosition);
 			mModel = glm::scale(mModel, glm::vec3(0.5f, 0.5f, 0.5f));
-			depthMVP = mPROJ * mViewFromLight * mModel;
-			spShadowMapper.SetUniform("depthMVP", depthMVP);
-			spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+			spShadowMapper.SetUniform("mModel", mModel);
 			amModels[3].RenderModel();
 		}
 
@@ -285,9 +293,7 @@ void RenderScene(LPVOID lpParam)
 			mModel = glm::translate(glm::mat4(1.0), vPosition);
 			mModel = glm::scale(mModel, glm::vec3(1.0f, 1.0f, 1.0f));
 
-			depthMVP = mPROJ * mViewFromLight * mModel;
-			spShadowMapper.SetUniform("depthMVP", depthMVP);
-			spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+			spShadowMapper.SetUniform("mModel", mModel);
 			amModels[0].RenderModel();
 		}
 
@@ -303,9 +309,7 @@ void RenderScene(LPVOID lpParam)
 			mModel = glm::rotate(mModel, arrows[i].fRotAngle, glm::vec3(0.0f, 1.0f, 0.0f));
 			mModel = glm::scale(mModel, glm::vec3(12.0f, 12.0f, 6.0f));
 			
-			depthMVP = mPROJ * mViewFromLight * mModel;
-			spShadowMapper.SetUniform("depthMVP", depthMVP);
-			spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+			spShadowMapper.SetUniform("mModel", mModel);
 			amModels[1].RenderModel();
 		}
 
@@ -313,35 +317,27 @@ void RenderScene(LPVOID lpParam)
 
 		mModel = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 80.0f, 0.0f));
 		mModel = glm::rotate(mModel, PI/2, glm::vec3(1.0f, 0.0f, 0.0f));
-		mModel = glm::rotate(mModel, -fAngleOfDarkness*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+		mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice]*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 		mModel = glm::scale(mModel, glm::vec3(20.0f, 20.0f, 10.0f));
 
-		depthMVP = mPROJ * mViewFromLight * mModel;
-		spShadowMapper.SetUniform("depthMVP", depthMVP);
-		spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
+		spShadowMapper.SetUniform("mModel", mModel);
 		amModels[1].RenderModel();
 
 		// Render the Hobo Goblin
 
 		mModel = glm::translate(glm::mat4(1.0), glm::vec3(vModelPosition));
 		mModel = glm::rotate(mModel, fModelRotation, glm::vec3(0, 1, 0));
-		mModel = glm::rotate(mModel, -90.0f, glm::vec3(1, 0, 0));
+		mModel = glm::rotate(mModel, -PI/2, glm::vec3(1, 0, 0));
 		mModel = glm::scale(mModel, glm::vec3(0.35f, 0.35f, 0.35f));
 
-		depthMVP = mPROJ * mViewFromLight * mModel;
-		spShadowMapper.SetUniform("depthMVP", depthMVP);
-		spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
-
+		spShadowMapper.SetUniform("mModel", mModel);
 		md2Models[0].RenderModel(&animationStateMain);
 
 		// ... and finally render heightmap
 
 		mModel = hmWorld.GetScaleMatrix();
 
-		depthMVP = mPROJ * mViewFromLight * mModel;
-		spShadowMapper.SetUniform("depthMVP", depthMVP);
-		spShadowMapper.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
-
+		spShadowMapper.SetUniform("mModel", mModel);
 		hmWorld.RenderHeightmapToShadowMap();
 
 		// Now the shadows are rendered, we can go back to normal rendering
@@ -378,29 +374,34 @@ void RenderScene(LPVOID lpParam)
 	spMain.SetUniform("vColor", glm::vec4(1, 1, 1, 1));
 
 	// You can play with direction of light with '+' and '-' key
-	if(Keys::Key(VK_ADD))fAngleOfDarkness += appMain.sof(90);
-	if(Keys::Key(VK_SUBTRACT))fAngleOfDarkness -= appMain.sof(90);
+	if(Keys::Key(VK_ADD))fAngleOfDarkness[iLightChoice] += appMain.sof(90);
+	if(Keys::Key(VK_SUBTRACT))fAngleOfDarkness[iLightChoice] -= appMain.sof(90);
 
-	if(fAngleOfDarkness < -90.0f) fAngleOfDarkness = -90.0f;
-	if(fAngleOfDarkness > 90.0f) fAngleOfDarkness = 90.0f;
+	if(fAngleOfDarkness[iLightChoice] < -90.0f) fAngleOfDarkness[iLightChoice] = -90.0f;
+	if(fAngleOfDarkness[iLightChoice] > 90.0f) fAngleOfDarkness[iLightChoice] = 90.0f;
 
-	// Set the directional vector of light
-	dlSun.vDirection = glm::vec3(-sin(fAngleOfDarkness*PI/180.0f), -cos(fAngleOfDarkness*PI/180.0f), 0.0f);
-
-	dlSun.iSkybox = 1;
-	dlSun.SetUniformData(&spMain, "sunLight");
+	FOR(l_i, iLightCount)
+	{
+		// Set the directional vector of light
+		dlSun[l_i].vDirection = glm::vec3(-sin(fAngleOfDarkness[l_i]*PI / 180.0f), -cos(fAngleOfDarkness[l_i] *PI / 180.0f), 0.0f);
+		dlSun[l_i].iSkybox = 1;
+		dlSun[l_i].SetUniformData(&spMain, "sunLight", l_i);
+	}
 
 	spMain.SetUniform("matrices.modelMatrix", glm::translate(glm::mat4(1.0), cCamera.vEye));
 	sbMainSkybox.RenderSkybox();
 
-	dlSun.iSkybox = 0;
-	dlSun.SetUniformData(&spMain, "sunLight");
+	FOR(l_i, iLightCount)
+	{
+		dlSun[l_i].iSkybox = 0;
+		dlSun[l_i].SetUniformData(&spMain, "sunLight", l_i);
+	}
 
 	spMain.SetUniform("vEyePosition", cCamera.vEye);
 	// I'm always using this shiny material, no matter what I render, it would be nice to change it sometimes :P
 	matShiny.SetUniformData(&spMain, "matActive"); 
 
-	spMain.SetUniform("matrices.depthBiasMVP", mDepthBiasMVP);
+	spMain.SetUniform("matrices.depthBiasMVP", mDepthBiasMVP, iLightCount);
 	// Bind shadow map to 5th texture unit (index is 5, if we count from 1 it's 6th)
 	// You can use whichever texture unit you want, I used 5 because of 5 textures in terrain and 6th first available
 	spMain.SetUniform("shadowMap", 5);
@@ -473,7 +474,7 @@ void RenderScene(LPVOID lpParam)
 
 	mModel = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 80.0f, 0.0f));
 	mModel = glm::rotate(mModel, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-	mModel = glm::rotate(mModel, -fAngleOfDarkness * PI / 180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+	mModel = glm::rotate(mModel, -fAngleOfDarkness[iLightChoice]*PI/180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
 	mModel = glm::scale(mModel, glm::vec3(20.0f, 20.0f, 10.0f));
 
 	spMain.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
@@ -488,17 +489,17 @@ void RenderScene(LPVOID lpParam)
 	spMD2Animation.SetUniform("gSampler", 0);
 	spMD2Animation.SetUniform("vColor", glm::vec4(1, 1, 1, 1));
 
-	dlSun.SetUniformData(&spMD2Animation, "sunLight");
+	FOR(l_i, iLightCount)dlSun[l_i].SetUniformData(&spMD2Animation, "sunLight", l_i);
 	matShiny.SetUniformData(&spMD2Animation, "matActive");
 
 	mModel = glm::translate(glm::mat4(1.0), glm::vec3(vModelPosition));
 	mModel = glm::rotate(mModel, fModelRotation, glm::vec3(0, 1, 0));
-	mModel = glm::rotate(mModel, -90.0f, glm::vec3(1, 0, 0));
+	mModel = glm::rotate(mModel, -PI/2, glm::vec3(1, 0, 0));
 	mModel = glm::scale(mModel, glm::vec3(0.35f, 0.35f, 0.35f));
 
 	spMD2Animation.SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", mModel);
 
-	spMD2Animation.SetUniform("matrices.depthBiasMVP", mDepthBiasMVP);
+	spMD2Animation.SetUniform("matrices.depthBiasMVP", mDepthBiasMVP, iLightCount);
 
 	spMD2Animation.SetUniform("shadowMap", 5);
 	fboShadowMap.BindFramebufferTexture(5, false);
@@ -546,9 +547,9 @@ void RenderScene(LPVOID lpParam)
 	spTerrain->SetModelAndNormalMatrix("matrices.modelMatrix", "matrices.normalMatrix", glm::mat4(1.0));
 	spTerrain->SetUniform("vColor", glm::vec4(1, 1, 1, 1));
 
-	dlSun.SetUniformData(spTerrain, "sunLight");
+	FOR(l_i, iLightCount)dlSun[l_i].SetUniformData(spTerrain, "sunLight", l_i);
 
-	spTerrain->SetUniform("matrices.depthBiasMVP", mDepthBiasMVP);
+	spTerrain->SetUniform("matrices.depthBiasMVP", mDepthBiasMVP, iLightCount);
 
 	// ... and finally render heightmap
 	hmWorld.RenderHeightmap();
@@ -581,6 +582,7 @@ void RenderScene(LPVOID lpParam)
 	ftFont.PrintFormatted(20, h-155, 20, "Move with arrow keys, shoot with SPACE ;)");
 	ftFont.PrintFormatted(20, h-180, 20, "Use + and - to play with direction of light");
 	ftFont.PrintFormatted(20, h-205, 20, "(the arrow in the sky shows direction of light)");
+	ftFont.PrintFormatted(20, h-230, 20, "Light Choice: %d", iLightChoice);
 
 	if(bDisplayShadowMap)
 	{
@@ -590,6 +592,7 @@ void RenderScene(LPVOID lpParam)
 		glBindVertexArray(uiVAOShadowMapQuad);
 		fboShadowMap.BindFramebufferTexture();
 		spShadowMapRender.SetUniform("shadowMap", 0);
+		spShadowMapRender.SetUniform("layer", iLightChoice);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 
@@ -598,8 +601,8 @@ void RenderScene(LPVOID lpParam)
 
 	if(Keys::Key(VK_UP))
 	{
-		float fSine = float(sin((fModelRotation+90)*3.1415f/180.0f));
-		float fCosine = float(cos((fModelRotation+90)*3.1415f/180.0f));
+		float fSine = float(sin(fModelRotation+PI/2));
+		float fCosine = float(cos(fModelRotation+PI/2));
 
 		glm::vec3 vMoveVector(fSine, 0, fCosine);
 
@@ -610,8 +613,8 @@ void RenderScene(LPVOID lpParam)
 	}
 	if(Keys::Key(VK_DOWN))
 	{
-		float fSine = float(sin((fModelRotation+90)*3.1415f/180.0f));
-		float fCosine = float(cos((fModelRotation+90)*3.1415f/180.0f));
+		float fSine = float(sin(fModelRotation+PI/2));
+		float fCosine = float(cos(fModelRotation+PI/2));
 
 		glm::vec3 vMoveVector(fSine, 0, fCosine);
 
@@ -621,9 +624,9 @@ void RenderScene(LPVOID lpParam)
 		bRunning = true;
 	}
 	if(Keys::Key(VK_LEFT))
-		fModelRotation += appMain.sof(135.0f);
+		fModelRotation += appMain.sof(135.0f*PI/180.0f);
 	if(Keys::Key(VK_RIGHT))
-		fModelRotation -= appMain.sof(135.0f);
+		fModelRotation -= appMain.sof(135.0f*PI/180.0f);
 
 	vModelPosition.y = hmWorld.GetHeightFromRealVector(vModelPosition)+8.0f;
 
@@ -634,10 +637,10 @@ void RenderScene(LPVOID lpParam)
 	{
 		SShootedArrow newArrow;
 		newArrow.fLifeTime = 4.0f;
-		newArrow.fRotAngle = fModelRotation+90;
+		newArrow.fRotAngle = fModelRotation + PI / 2;
 
-		float fSine = float(sin((fModelRotation+90)*3.1415f/180.0f));
-		float fCosine = float(cos((fModelRotation+90)*3.1415f/180.0f));
+		float fSine = float(sin(fModelRotation + PI / 2));
+		float fCosine = float(cos(fModelRotation + PI / 2));
 
 		newArrow.vDir = glm::vec3(fSine, 0, fCosine);
 		newArrow.vPos = vModelPosition;
@@ -652,6 +655,7 @@ void RenderScene(LPVOID lpParam)
 
 	if(Keys::Onekey('R'))bShadowsOn = !bShadowsOn;
 	if(Keys::Onekey('M'))bDisplayShadowMap = !bDisplayShadowMap;
+	if(Keys::Onekey(VK_TAB))iLightChoice = (iLightChoice+1)%iLightCount;
 
 	bool bRecreate = false;
 	if(Keys::Onekey(VK_PRIOR))
@@ -669,7 +673,7 @@ void RenderScene(LPVOID lpParam)
 	if(bRecreate)
 	{
 		fboShadowMap.DeleteFramebuffer();
-		fboShadowMap.CreateFrameBufferForDepthShadow(iShadowMapTextureSize, iShadowMapTextureSize);
+		fboShadowMap.CreateFrameBufferForDepthShadow(iShadowMapTextureSize, iShadowMapTextureSize, iLightCount);
 	}
 
 	glEnable(GL_DEPTH_TEST);	

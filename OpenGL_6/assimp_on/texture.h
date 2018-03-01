@@ -15,6 +15,7 @@ class CTexture
 public:
 	void CreateEmptyTexture(int a_iWidth, int a_iHeight);
 	void CreateDepthTexture(int a_iWidth, int a_iHeight);
+	void CreateDepthTexture(int a_iWidth, int a_iHeight, int a_iDepth);
 	void CreateRotationTexture(int a_iWidth, int a_iHeight);
 	void CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iBPP, GLenum format);
 

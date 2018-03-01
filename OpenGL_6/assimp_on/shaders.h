@@ -91,7 +91,7 @@ private:
 bool PrepareShaderPrograms();
 void DeleteAllShaderPrograms();
 
-#define NUMSHADERS 17
+#define NUMSHADERS 18
 
 extern CShader shShaders[NUMSHADERS];
 extern CShaderProgram spMain, spOrtho2D, spFont2D, spNormalDisplayer, spMD2Animation, spSkybox, spShadowMapper, spShadowMapRender;

@@ -1,12 +1,14 @@
 #version 330
 
+#include "dirLight.frag"
+
 uniform struct Matrices
 {
 	mat4 projMatrix;
 	mat4 modelMatrix;
 	mat4 viewMatrix;                                                                           
 	mat4 normalMatrix;
-	mat4 depthBiasMVP;
+	mat4 depthBiasMVP[iLightCount];
 } matrices;
 
 layout (location = 0) in vec3 inPosition;
@@ -18,7 +20,7 @@ smooth out vec2 vTexCoord;
 smooth out vec3 vWorldPos;
 
 smooth out vec4 vEyeSpacePos;
-smooth out vec4 ShadowCoord;
+smooth out vec4 ShadowCoord[iLightCount];
 
 void main()
 {
@@ -33,5 +35,6 @@ void main()
   vNormal = (matrices.normalMatrix*vec4(inNormal, 1.0)).xyz;
   vWorldPos = (matrices.modelMatrix*vec4(inPosition, 1.0)).xyz;
   
-  ShadowCoord = matrices.depthBiasMVP * vec4(vWorldPos, 1.0);
+  for(int l_i = 0; l_i < iLightCount; l_i++)
+    ShadowCoord[l_i] = matrices.depthBiasMVP[l_i] * vec4(vWorldPos, 1.0);
 }

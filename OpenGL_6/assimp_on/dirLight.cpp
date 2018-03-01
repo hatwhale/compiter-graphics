@@ -39,3 +39,13 @@ void CDirectionalLight::SetUniformData(CShaderProgram *spProgram, std::string sL
 	spProgram->SetUniform(sLightVarName+".fAmbient", fAmbient);
 	spProgram->SetUniform(sLightVarName+".iSkybox", iSkybox);
 }
+
+void CDirectionalLight::SetUniformData(CShaderProgram *spProgram, std::string sLightVarName, int index)
+{
+	std::string sIndex = '[' + std::to_string(index) + ']';
+	spProgram->SetUniform(sLightVarName + sIndex + ".vColor", vColor);
+	spProgram->SetUniform(sLightVarName + sIndex + ".vDirection", vDirection);
+
+	spProgram->SetUniform(sLightVarName + sIndex + ".fAmbient", fAmbient);
+	spProgram->SetUniform(sLightVarName + sIndex + ".iSkybox", iSkybox);
+}
