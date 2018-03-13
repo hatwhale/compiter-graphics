@@ -119,34 +119,6 @@
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="common.h" />
-    <ClInclude Include="GLWindow.h" />
-    <ClInclude Include="include\gl\glext.h" />
-    <ClInclude Include="include\gl\wglext.h" />
-    <ClInclude Include="include\math\mat2.h" />
-    <ClInclude Include="include\math\mat3.h" />
-    <ClInclude Include="include\math\mat4.h" />
-    <ClInclude Include="include\math\math3d.h" />
-    <ClInclude Include="include\math\mathgl.h" />
-    <ClInclude Include="include\math\quat.h" />
-    <ClInclude Include="include\math\vec2.h" />
-    <ClInclude Include="include\math\vec3.h" />
-    <ClInclude Include="include\math\vec4.h" />
-    <ClInclude Include="include\models\cube.h" />
-    <ClInclude Include="include\models\plane.h" />
-    <ClInclude Include="include\models\quad.h" />
-    <ClInclude Include="include\models\sphere.h" />
-    <ClInclude Include="include\models\torus.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="OpenGL.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Texture.h" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="data\aberration.frag" />
     <None Include="data\bloom.frag" />
     <None Include="data\blur.frag" />
@@ -164,6 +136,21 @@
     <None Include="data\sepia.frag" />
     <None Include="data\shadowmap.frag" />
     <None Include="data\shadowmap.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="GLWindow.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="OpenGL.h" />
+    <ClInclude Include="Shader.h" />
+    <ClInclude Include="Texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="15_OpenGL_6.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
