@@ -70,6 +70,7 @@ static Posteffect posteffects[posteffectsCount] = {
 	{VK_F6, "data/emboss.frag",     0},
 	{VK_F7, "data/aberration.frag", 0}
 };
+uint32_t posteffectChoice = 0;
 
 // вершины полноэкранного прямоугольника
 // координаты и текстурные координаты (текстура цвета)
@@ -361,7 +362,10 @@ void GLWindowInput(const GLWindow &window)
 
 	for (uint32_t p = 0; p < posteffectsCount; ++p)
 		if (InputIsKeyPressed(posteffects[p].key))
+		{
 			posteffectProgram = posteffects[p].program;
+			posteffectChoice = p;
+		}
 
 	// переключение между оконным и полноэкранным режимом
 	// осуществляется по нажатию комбинации Alt+Enter
@@ -370,9 +374,9 @@ void GLWindowInput(const GLWindow &window)
 
 	// сдвиг границы фильтрации изображения
 	// осуществляется стрелками влево/вправо
-	if (posteffectBorder > 0.0)
+	if (posteffectBorder > 0.0 && posteffectChoice != 0)
 		posteffectBorder -= 0.01 * (float)InputIsKeyDown(VK_LEFT);
-	if (posteffectBorder < 1.0)
+	if (posteffectBorder < 1.0 && posteffectChoice != 0)
 		posteffectBorder += 0.01 * (float)InputIsKeyDown(VK_RIGHT);
 
 	moveDelta[0] = 10 * ((int)InputIsKeyDown('D') - (int)InputIsKeyDown('A'));
