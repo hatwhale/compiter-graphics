@@ -17,7 +17,7 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 
 vec3 filter(in vec2 texcoord)
 {
-	return vec3(pow(texture(colorTexture, texcoord).rgb, vec3(1.0/Gamma)));
+	return Gamma * vec3(log(1 + texture(colorTexture, texcoord).rgb));
 }
 
 void main()

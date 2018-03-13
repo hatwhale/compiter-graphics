@@ -148,6 +148,7 @@
     <None Include="data\extra_filters\deferred.frag" />
     <None Include="data\extra_filters\edge.frag" />
     <None Include="data\extra_filters\gamma.frag" />
+    <None Include="data\extra_filters\log.frag" />
     <None Include="data\posteffect.vert" />
     <None Include="data\shadowmap.frag" />
     <None Include="data\shadowmap.vert" />

@@ -26,6 +26,9 @@ void ShaderProgramBind(GLuint program);
 void ShaderProgramUnbind();
 
 // задает float uniform в указанной шейдерной программе
-void ShaderSetUniform(GLuint program, const GLchar *name, const float fValue);
+void ShaderSetFloat(GLuint program, const GLchar *name, const float fValue);
+
+// задает mat3 uniform в указанной шейдерной программе
+void ShaderSetMatrix(GLuint program, const GLchar *name, const mat3 mMatrix);
 
 #endif /* SHADER_H */

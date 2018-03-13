@@ -41,6 +41,10 @@ static GLuint colorTexture = 0, depthTexture = 0, posteffectTexture = 0, posteff
 // граница фильтрованного изображения
 float posteffectBorder = 0.5;
 
+// параметры для фильтраций
+float posteffectGamma = 0.5;
+float posteffectEdgeThreshold = 0.5;
+
 // индекс FBO
 static GLuint depthFBO = 0, posteffectFBO = 0;
 
@@ -60,15 +64,20 @@ static Light  directionalLight;
 static Camera mainCamera, lightCamera;
 
 // пост-эффекты 
-static const uint32_t posteffectsCount = 7;
+static const uint32_t posteffectsCount = 7 + 3;
 static Posteffect posteffects[posteffectsCount] = {
+	// изначальные фильтры
 	{VK_F1, "data/default_filters/normal.frag",     0},
 	{VK_F2, "data/default_filters/grayscale.frag",  0},
 	{VK_F3, "data/default_filters/sepia.frag",      0},
 	{VK_F4, "data/default_filters/inverse.frag",    0},
 	{VK_F5, "data/default_filters/blur.frag",       0},
 	{VK_F6, "data/default_filters/emboss.frag",     0},
-	{VK_F7, "data/default_filters/aberration.frag", 0}
+	{VK_F7, "data/default_filters/aberration.frag", 0},
+	// добавленные фильтры
+	{VK_F8, "data/extra_filters/gamma.frag", 0},
+	{VK_F9, "data/extra_filters/edge.frag", 0},
+	{VK_F10, "data/extra_filters/log.frag", 0}
 };
 uint32_t posteffectChoice = 0;
 
@@ -309,7 +318,14 @@ void GLWindowRender(const GLWindow &window)
 	TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTexture);
 	TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTexture);
 	// устанавливаем границу фильтрованного изображения
-	ShaderSetUniform(posteffectProgram, "border", posteffectBorder);
+	ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
+	// устанавливаем параметр для различных фильтраций
+	ShaderSetFloat(posteffectProgram, "Gamma", posteffectGamma);
+	ShaderSetFloat(posteffectProgram, "EdgeThreshold", posteffectEdgeThreshold);
+	mat3 sobelKernel = mat3(1.0, 0.0, -1.0,
+							2.0, 0.0, -2.0,
+							1.0, 0.0, -1.0);
+	ShaderSetMatrix(posteffectProgram, "Kernel", sobelKernel);
 	// выводим полноэкранный прямоугольник на экран
 	glBindVertexArray(fsqVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -378,6 +394,14 @@ void GLWindowInput(const GLWindow &window)
 		posteffectBorder -= 0.01 * (float)InputIsKeyDown(VK_LEFT);
 	if (posteffectBorder < 1.0 && posteffectChoice != 0)
 		posteffectBorder += 0.01 * (float)InputIsKeyDown(VK_RIGHT);
+
+	// изменение параметра для различных фильтраций
+	// осуществляется стрелками вверх/вниз
+	float diff= 0.01 * ((float)InputIsKeyDown(VK_UP) - (float)InputIsKeyDown(VK_DOWN));
+	if (posteffectGamma + diff > 0.0 && posteffectChoice >= 7)
+		posteffectGamma += diff;
+	if (posteffectEdgeThreshold + diff > 0.0 && posteffectChoice == 8)
+		posteffectEdgeThreshold += diff;
 
 	moveDelta[0] = 10 * ((int)InputIsKeyDown('D') - (int)InputIsKeyDown('A'));
 	moveDelta[1] = 10 * ((int)InputIsKeyDown('S') - (int)InputIsKeyDown('W'));

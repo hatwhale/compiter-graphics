@@ -144,5 +144,8 @@
     <None Include="data\extra_filters\gamma.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
+    <None Include="data\extra_filters\log.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
   </ItemGroup>
 </Project>

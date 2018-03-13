@@ -207,8 +207,14 @@ void ShaderProgramUnbind()
 	glUseProgram(0);
 }
 
-void ShaderSetUniform(GLuint program, const GLchar *name, const float fValue)
+void ShaderSetFloat(GLuint program, const GLchar *name, const float fValue)
 {
 	// установка данного float uniform в шейдерной программе
 	glUniform1fv(glGetUniformLocation(program, name), 1, &fValue);
+}
+
+void ShaderSetMatrix(GLuint program, const GLchar *name, const mat3 mMatrix)
+{
+	// установка данной mat3 uniform в шейдерной программе
+	glUniformMatrix3fv(glGetUniformLocation(program, name), 1, FALSE, (GLfloat*)&mMatrix);
 }
