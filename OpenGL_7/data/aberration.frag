@@ -2,6 +2,9 @@
 // текстуры
 uniform sampler2D colorTexture, depthTexture;
 
+// граница фильтрации
+uniform float border;
+
 // параметры полученные из вершинного шейдера
 in Vertex
 {
@@ -21,7 +24,7 @@ vec3 filter(in vec2 texcoord)
 
 void main(void)
 {
-	vec3 texel = Vert.texcoord.x < 0.5 ? filter(Vert.texcoord)
+	vec3 texel = Vert.texcoord.x < border ? filter(Vert.texcoord)
 		: texture(colorTexture, Vert.texcoord).rgb;
 
 	color = vec4(texel, 1.0);

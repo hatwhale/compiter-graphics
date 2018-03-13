@@ -25,4 +25,7 @@ void ShaderProgramBind(GLuint program);
 // делает текущую шейдерную программу неактивной
 void ShaderProgramUnbind();
 
+// задает float uniform в указанной шейдерной программе
+void ShaderSetUniform(GLuint program, const GLchar *name, const float fValue);
+
 #endif /* SHADER_H */

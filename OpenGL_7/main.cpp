@@ -38,6 +38,9 @@ static GLuint depthProgram = 0, shadowmapProgram = 0, posteffectProgram = 0;
 // индексы текстур
 static GLuint colorTexture = 0, depthTexture = 0, posteffectTexture = 0, posteffectDepthTexture = 0;
 
+// граница фильтрованного изображения
+float posteffectBorder = 0.5;
+
 // индекс FBO
 static GLuint depthFBO = 0, posteffectFBO = 0;
 
@@ -304,6 +307,8 @@ void GLWindowRender(const GLWindow &window)
 	// устанавливаем текстуру сцены в 0-й текстурный юнит
 	TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTexture);
 	TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTexture);
+	// устанавливаем границу фильтрованного изображения
+	ShaderSetUniform(posteffectProgram, "border", posteffectBorder);
 	// выводим полноэкранный прямоугольник на экран
 	glBindVertexArray(fsqVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -362,6 +367,13 @@ void GLWindowInput(const GLWindow &window)
 	// осуществляется по нажатию комбинации Alt+Enter
 	if (InputIsKeyDown(VK_MENU) && InputIsKeyPressed(VK_RETURN))
 		GLWindowSetSize(window.width, window.height, !window.fullScreen);
+
+	// сдвиг границы фильтрации изображения
+	// осуществляется стрелками влево/вправо
+	if (posteffectBorder > 0.0)
+		posteffectBorder -= 0.01 * (float)InputIsKeyDown(VK_LEFT);
+	if (posteffectBorder < 1.0)
+		posteffectBorder += 0.01 * (float)InputIsKeyDown(VK_RIGHT);
 
 	moveDelta[0] = 10 * ((int)InputIsKeyDown('D') - (int)InputIsKeyDown('A'));
 	moveDelta[1] = 10 * ((int)InputIsKeyDown('S') - (int)InputIsKeyDown('W'));

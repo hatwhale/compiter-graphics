@@ -202,3 +202,9 @@ void ShaderProgramUnbind()
 	// сделаем текущую шейдерную программу неактивной
 	glUseProgram(0);
 }
+
+void ShaderSetUniform(GLuint program, const GLchar *name, const float fValue)
+{
+	// установка данного float uniform в шейдерной программе
+	glUniform1fv(glGetUniformLocation(program, name), 1, &fValue);
+}
