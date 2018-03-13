@@ -119,25 +119,6 @@
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\aberration.frag" />
-    <None Include="data\bloom.frag" />
-    <None Include="data\blur.frag" />
-    <None Include="data\centroid.frag" />
-    <None Include="data\deferred.frag" />
-    <None Include="data\depth.frag" />
-    <None Include="data\depth.vert" />
-    <None Include="data\edge.frag" />
-    <None Include="data\emboss.frag" />
-    <None Include="data\gamma.frag" />
-    <None Include="data\grayscale.frag" />
-    <None Include="data\inverse.frag" />
-    <None Include="data\normal.frag" />
-    <None Include="data\posteffect.vert" />
-    <None Include="data\sepia.frag" />
-    <None Include="data\shadowmap.frag" />
-    <None Include="data\shadowmap.vert" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="GLWindow.h" />
@@ -151,6 +132,25 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="15_OpenGL_6.log" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\default_filters\aberration.frag" />
+    <None Include="data\default_filters\blur.frag" />
+    <None Include="data\default_filters\emboss.frag" />
+    <None Include="data\default_filters\grayscale.frag" />
+    <None Include="data\default_filters\inverse.frag" />
+    <None Include="data\default_filters\normal.frag" />
+    <None Include="data\default_filters\sepia.frag" />
+    <None Include="data\depth.frag" />
+    <None Include="data\depth.vert" />
+    <None Include="data\extra_filters\bloom.frag" />
+    <None Include="data\extra_filters\centroid.frag" />
+    <None Include="data\extra_filters\deferred.frag" />
+    <None Include="data\extra_filters\edge.frag" />
+    <None Include="data\extra_filters\gamma.frag" />
+    <None Include="data\posteffect.vert" />
+    <None Include="data\shadowmap.frag" />
+    <None Include="data\shadowmap.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
+    <Filter Include="Resource Files\deafult filters">
+      <UniqueIdentifier>{339f47cd-1429-499c-84b8-25d58f38dfe8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\extra filters">
+      <UniqueIdentifier>{dee4289f-1cad-4423-8633-ad862233cc93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
@@ -50,59 +56,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\aberration.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\bloom.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\blur.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\centroid.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\deferred.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\depth.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\depth.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\edge.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\emboss.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\gamma.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\grayscale.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\inverse.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\normal.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\posteffect.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\sepia.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\shadowmap.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\shadowmap.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -138,5 +91,58 @@
     <Text Include="15_OpenGL_6.log">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\depth.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\depth.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\posteffect.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\shadowmap.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\shadowmap.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="data\default_filters\aberration.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\default_filters\blur.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\default_filters\emboss.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\default_filters\grayscale.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\default_filters\inverse.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\default_filters\normal.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\default_filters\sepia.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\extra_filters\bloom.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\extra_filters\centroid.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\extra_filters\deferred.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\extra_filters\edge.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\extra_filters\gamma.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
   </ItemGroup>
 </Project>

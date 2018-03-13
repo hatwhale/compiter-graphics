@@ -5,7 +5,9 @@
 
 // набор параметров для вершинного шейдера
 static const char vertexShaderDefines[] =
-	"#version 330 core\n"
+	//"#version 330 core\n"
+	"#version 150 core\n"
+	"#extension GL_ARB_explicit_attrib_location : enable\n"
 	DEFINE_TO_STR(VERT_POSITION)
 	DEFINE_TO_STR(VERT_TEXCOORD)
 	DEFINE_TO_STR(VERT_NORMAL)
@@ -13,7 +15,9 @@ static const char vertexShaderDefines[] =
 
 // набор параметров для фрагментного шейдера
 static const char fragmentShaderDefines[] =
-	"#version 330 core\n"
+	//"#version 330 core\n"
+	"#version 150 core\n"
+	"#extension GL_ARB_explicit_attrib_location : enable\n"
 	DEFINE_TO_STR(FRAG_OUTPUT0)
 	"\n";
 

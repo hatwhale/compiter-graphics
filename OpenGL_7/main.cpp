@@ -62,13 +62,13 @@ static Camera mainCamera, lightCamera;
 // пост-эффекты 
 static const uint32_t posteffectsCount = 7;
 static Posteffect posteffects[posteffectsCount] = {
-	{VK_F1, "data/normal.frag",     0},
-	{VK_F2, "data/grayscale.frag",  0},
-	{VK_F3, "data/sepia.frag",      0},
-	{VK_F4, "data/inverse.frag",    0},
-	{VK_F5, "data/blur.frag",       0},
-	{VK_F6, "data/emboss.frag",     0},
-	{VK_F7, "data/aberration.frag", 0}
+	{VK_F1, "data/default_filters/normal.frag",     0},
+	{VK_F2, "data/default_filters/grayscale.frag",  0},
+	{VK_F3, "data/default_filters/sepia.frag",      0},
+	{VK_F4, "data/default_filters/inverse.frag",    0},
+	{VK_F5, "data/default_filters/blur.frag",       0},
+	{VK_F6, "data/default_filters/emboss.frag",     0},
+	{VK_F7, "data/default_filters/aberration.frag", 0}
 };
 uint32_t posteffectChoice = 0;
 
