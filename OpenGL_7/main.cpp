@@ -84,23 +84,26 @@ uint32_t posteffectChoice = 0;
 // фильтры
 
 // сглаживающие фильтры
-static const uint32_t blurFiltersCount = 2;
+static const uint32_t blurFiltersCount = 3;
 static mat3 blurFilters[blurFiltersCount] = {
 	// усредняющий фильтр
 	mat3(1.0, 1.0, 1.0,
-		 1.0, 10.0, 1.0,
+		 1.0, 1.0, 1.0,
 		 1.0, 1.0, 1.0) / 9, 
 	// стандартный blur фильтр
 	mat3(1.0, 2.0, 1.0,
-		 2.0, 0.0, 2.0,
-		 1.0, 2.0, 1.0) / 16
+		 2.0, 4.0, 2.0,
+		 1.0, 2.0, 1.0) / 16,
+	mat3(0.0, -1.0, 0.0,
+		 -1.0, 5.0, -1.0,
+		 0.0, -1.0, 0.0)
 };
 uint32_t blurFilterChoice = 0;
 
 // контрсатоповышающие фильтры
 
 // разностные фильтры
-static const uint32_t edgeFiltersCount = 4;
+static const uint32_t edgeFiltersCount = 5;
 static mat3 edgeFilters[edgeFiltersCount] = {
 	mat3(2.0, 0.0, 0.0,
 		 0.0, -1.0, 0.0,
@@ -116,7 +119,11 @@ static mat3 edgeFilters[edgeFiltersCount] = {
 	// оператор Шарра
 	mat3(-3.0, 0.0, 3.0,
 		 -10.0, 0.0, 10.0,
-		 -3.0, 0.0, 3.0) / 16
+		 -3.0, 0.0, 3.0) / 16,
+	// оператор Лапласа
+	mat3(-1.0, -1.0,-1.0,
+		 -1.0,  8.0, -1.0,
+		 -1.0, -1.0, -1.0)
 };
 uint32_t edgeFilterChoice = 0;
 uint32_t embossFilterChoice = 0;
