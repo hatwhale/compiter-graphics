@@ -93,59 +93,59 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\depth.frag">
+    <None Include="data\shaders\default_filters\aberration.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\default_filters\blur.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\default_filters\emboss.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\default_filters\grayscale.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\default_filters\inverse.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\default_filters\normal.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\default_filters\sepia.frag">
+      <Filter>Resource Files\deafult filters</Filter>
+    </None>
+    <None Include="data\shaders\extra_filters\bloom.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\shaders\extra_filters\centroid.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\shaders\extra_filters\deferred.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\shaders\extra_filters\edge.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\shaders\extra_filters\gamma.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\shaders\extra_filters\log.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
+    <None Include="data\shaders\depth.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="data\depth.vert">
+    <None Include="data\shaders\depth.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="data\posteffect.vert">
+    <None Include="data\shaders\posteffect.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="data\shadowmap.frag">
+    <None Include="data\shaders\shadowmap.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="data\shadowmap.vert">
+    <None Include="data\shaders\shadowmap.vert">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="data\default_filters\aberration.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\default_filters\blur.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\default_filters\emboss.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\default_filters\grayscale.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\default_filters\inverse.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\default_filters\normal.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\default_filters\sepia.frag">
-      <Filter>Resource Files\deafult filters</Filter>
-    </None>
-    <None Include="data\extra_filters\bloom.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
-    <None Include="data\extra_filters\centroid.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
-    <None Include="data\extra_filters\deferred.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
-    <None Include="data\extra_filters\edge.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
-    <None Include="data\extra_filters\gamma.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
-    <None Include="data\extra_filters\log.frag">
-      <Filter>Resource Files\extra filters</Filter>
     </None>
   </ItemGroup>
 </Project>

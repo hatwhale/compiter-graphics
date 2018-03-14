@@ -15,7 +15,7 @@
 
 // вспомогательный макрос
 #define LOAD_SHADER(name) \
-	ShaderProgramCreateFromFile("data/" name ".vert", "data/" name ".frag")
+	ShaderProgramCreateFromFile("data/shaders/" name ".vert", "data/shaders/" name ".frag")
 
 // структура описания пост-эффекта
 struct Posteffect
@@ -35,10 +35,15 @@ struct fsqVertex
 // индекс шейдерной программы
 static GLuint depthProgram = 0, shadowmapProgram = 0, posteffectProgram = 0;
 
+// индекс FBO
+static GLuint depthFBO = 0;
+static const uint32_t posteffectFBOsCount = 3;
+static GLuint posteffectFBOs[posteffectFBOsCount];
+
 // индексы текстур
-static GLuint colorTexture = 0, depthTexture = 0, posteffectTexture = 0, posteffectDepthTexture = 0;
-static GLuint posteffectTextures[2];
-static GLuint posteffectDepthTextures[2];
+static GLuint depthTexture = 0, colorTexture = 0;
+static GLuint posteffectTextures[posteffectFBOsCount];
+static GLuint posteffectDepthTextures[posteffectFBOsCount];
 
 // граница фильтрованного изображения
 float posteffectBorder = 0.5;
@@ -46,10 +51,6 @@ float posteffectBorder = 0.5;
 // параметры для фильтраций
 float posteffectGamma = 0.5;
 float posteffectEdgeThreshold = 0.2;
-
-// индекс FBO
-static GLuint depthFBO = 0, posteffectFBO = 0;
-static GLuint posteffectFBOs[2];
 
 // VAO и VBO для полноэкранного прямоугольника
 static GLuint fsqVAO = 0, fsqVBO = 0;
@@ -60,6 +61,7 @@ static int cursorPos[2] = {0,0}, rotateDelta[2] = {0,0}, moveDelta[2] = {0,0};
 static const uint32_t meshCount = 3;
 static Mesh           meshes[meshCount];
 static Material       materials[meshCount];
+static GLuint materialTextures[meshCount];
 
 static float3 torusRotation = {0.0f, 0.0f, 0.0f};
 
@@ -70,17 +72,17 @@ static Camera mainCamera, lightCamera;
 static const uint32_t posteffectsCount = 7 + 3;
 static Posteffect posteffects[posteffectsCount] = {
 	// изначальные постэффекты
-	{VK_F1, "data/default_filters/normal.frag",     0},
-	{VK_F2, "data/default_filters/grayscale.frag",  0},
-	{VK_F3, "data/default_filters/sepia.frag",      0},
-	{VK_F4, "data/default_filters/inverse.frag",    0},
-	{VK_F5, "data/default_filters/blur.frag",       0},
-	{VK_F6, "data/default_filters/emboss.frag",     0},
-	{VK_F7, "data/default_filters/aberration.frag", 0},
+	{VK_F1, "data/shaders/default_filters/normal.frag",     0},
+	{VK_F2, "data/shaders/default_filters/grayscale.frag",  0},
+	{VK_F3, "data/shaders/default_filters/sepia.frag",      0},
+	{VK_F4, "data/shaders/default_filters/inverse.frag",    0},
+	{VK_F5, "data/shaders/default_filters/blur.frag",       0},
+	{VK_F6, "data/shaders/default_filters/emboss.frag",     0},
+	{VK_F7, "data/shaders/default_filters/aberration.frag", 0},
 	// добавленные постэффекты
-	{VK_F8, "data/extra_filters/gamma.frag", 0},
-	{VK_F9, "data/extra_filters/edge.frag", 0},
-	{VK_F10, "data/extra_filters/log.frag", 0}
+	{VK_F8, "data/shaders/extra_filters/gamma.frag", 0},
+	{VK_F9, "data/shaders/extra_filters/edge.frag", 0},
+	{VK_F10, "data/shaders/extra_filters/log.frag", 0}
 };
 uint32_t posteffectChoice = 0;
 
@@ -166,7 +168,7 @@ bool GLWindowInit(const GLWindow &window)
 
 	for (uint32_t p = 0; p < posteffectsCount; ++p)
 	{
-		posteffects[p].program = ShaderProgramCreateFromFile("data/posteffect.vert", posteffects[p].shader);
+		posteffects[p].program = ShaderProgramCreateFromFile("data/shaders/posteffect.vert", posteffects[p].shader);
 
 		if (posteffects[p].program == 0)
 			return false;
@@ -176,21 +178,18 @@ bool GLWindowInit(const GLWindow &window)
 
 	// настроим направленный источник освещения
 	LightDefault(directionalLight, LT_DIRECTIONAL);
-	directionalLight.position.set(3.0f, 3.0f, 3.0f, 0.0f);
+	directionalLight.position.set(10.0f, 10.0f, 10.0f, 0.0f);
 
 	// загрузим текстуры
-	colorTexture = TextureCreateFromTGA("data/texture.tga");
+	materialTextures[0] = TextureCreateFromTGA("data/textures/grass.tga");
+	materialTextures[1] = TextureCreateFromTGA("data/textures/floor.tga");
+	materialTextures[2]	= TextureCreateFromTGA("data/textures/texture.tga");					
 
 	// создадим текстуру для хранения глубины
 	depthTexture = TextureCreateDepth(window.width * 2, window.height * 2);
 
 	// создадим "пустые" текстуры для FBO размером с текущее окно
-	posteffectTexture = TextureCreateEmpty(GL_RGBA8, GL_RGBA,
-		GL_UNSIGNED_BYTE, window.width, window.height);
-	posteffectDepthTexture = TextureCreateEmpty(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
-		GL_UNSIGNED_BYTE, window.width, window.height);
-	
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < posteffectFBOsCount; i++)
 	{
 		posteffectTextures[i] = TextureCreateEmpty(GL_RGBA8, GL_RGBA,
 			GL_UNSIGNED_BYTE, window.width, window.height);
@@ -202,13 +201,13 @@ bool GLWindowInit(const GLWindow &window)
 	// плоскость под вращающимся тором
 	MeshCreateQuad(meshes[0], vec3(0.0f, -1.6f, 0.0f), 30.0f);
 	MaterialDefault(materials[0]);
-	materials[0].texture = colorTexture;
-	materials[0].diffuse.set(0.3f, 1.0f, 0.5f, 1.0f);
+	materials[0].texture = materialTextures[0];
+	materials[0].diffuse.set(0.7f, 1.0f, 0.7f, 1.0f);
 
 	// вращающийся тор
 	MeshCreateTorus(meshes[1], vec3(0.0f, 1.2f, 0.0f), 2.0f);
 	MaterialDefault(materials[1]);
-	materials[1].texture = colorTexture;
+	materials[1].texture = materialTextures[1];
 	materials[1].diffuse.set(0.3f, 0.5f, 1.0f, 1.0f);
 	materials[1].specular.set(0.8f, 0.8f, 0.8f, 1.0f);
 	materials[1].shininess = 20.0f;
@@ -216,7 +215,7 @@ bool GLWindowInit(const GLWindow &window)
 	// вращающийся тор
 	MeshCreateTorus(meshes[2], vec3(0.0f, 1.2f, 0.0f), 1.0f);
 	MaterialDefault(materials[2]);
-	materials[2].texture = colorTexture;
+	materials[2].texture = materialTextures[2];
 	materials[2].diffuse.set(1.0f, 0.5f, 0.3f, 1.0f);
 	materials[2].specular.set(0.8f, 0.8f, 0.8f, 1.0f);
 	materials[2].shininess = 20.0f;
@@ -228,7 +227,7 @@ bool GLWindowInit(const GLWindow &window)
 
 	// камера источника света
 	CameraLookAt(lightCamera, directionalLight.position, -directionalLight.position, vec3_y);
-	CameraOrtho(lightCamera, -5.0f, 5.0f, -5.0f, 5.0f, -10.0f, 10.0f);
+	CameraOrtho(lightCamera, -5.0f, 5.0f, -5.0f, 5.0f, -10.0f, 20.0f);
 
 	GLenum fboStatus;
 
@@ -253,28 +252,10 @@ bool GLWindowInit(const GLWindow &window)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// создаем FBO для рендера сцены
-	glGenFramebuffers(1, &posteffectFBO);
-	// делаем созданный FBO текущим
-	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBO);
-
-	// присоединяем текстуры к FBO
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, posteffectTexture,      0);
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,  posteffectDepthTexture, 0);
-
-	// проверим текущий FBO на корректность
-	if ((fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		LOG_ERROR("glCheckFramebufferStatus error 0x%X\n", fboStatus);
-		return false;
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	// создаем FBO для множественной фильтрации
-	glGenFramebuffers(2, posteffectFBOs);
+	glGenFramebuffers(posteffectFBOsCount, posteffectFBOs);
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < posteffectFBOsCount; i++)
 	{
 		// делаем созданный FBO текущим
 		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[i]);
@@ -338,13 +319,15 @@ void GLWindowClear(const GLWindow &window)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDeleteFramebuffers(1, &depthFBO);
-	glDeleteFramebuffers(1, &posteffectFBO);
+	glDeleteFramebuffers(2, posteffectFBOs);
 
-	TextureDestroy(colorTexture);
+
 	TextureDestroy(depthTexture);
-	TextureDestroy(posteffectTexture);
-	TextureDestroy(posteffectDepthTexture);
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < meshCount; i++)
+	{
+		TextureDestroy(materialTextures[i]);
+	}
+	for (int i = 0; i < posteffectFBOsCount; i++)
 	{
 		TextureDestroy(posteffectTextures[i]);
 		TextureDestroy(posteffectDepthTextures[i]);
@@ -388,12 +371,12 @@ void GLWindowRender(const GLWindow &window)
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glCullFace(GL_BACK);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[0]);
+	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[2]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderScene(shadowmapProgram, mainCamera);
 
-	bool pingpong = true;
+	bool pingpong = true, first_init = true;
 	for (int i = 0; i < 10; i++)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[pingpong]);
@@ -401,8 +384,16 @@ void GLWindowRender(const GLWindow &window)
 		// устанавливаем шейдерную программу с реализацией экранного эффекта
 		ShaderProgramBind(posteffectProgram);
 		// устанавливаем текстуру сцены в 0-й текстурный юнит
-		TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
-		TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTextures[!pingpong]);
+		if (first_init)
+		{
+			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[2]);
+			TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTextures[2]);
+		}
+		else
+		{
+			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
+			TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTextures[!pingpong]);
+		}
 		// устанавливаем границу фильтрованного изображения
 		ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
 		// устанавливаем параметр для различных фильтраций
@@ -419,6 +410,7 @@ void GLWindowRender(const GLWindow &window)
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		pingpong = !pingpong;
+		first_init = false;
 	}
 
 	// устанавливаем дефолтный FBO активным
