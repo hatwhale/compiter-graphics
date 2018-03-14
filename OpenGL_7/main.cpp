@@ -43,7 +43,7 @@ float posteffectBorder = 0.5;
 
 // параметры для фильтраций
 float posteffectGamma = 0.5;
-float posteffectEdgeThreshold = 0.5;
+float posteffectEdgeThreshold = 0.2;
 
 // индекс FBO
 static GLuint depthFBO = 0, posteffectFBO = 0;
@@ -66,7 +66,7 @@ static Camera mainCamera, lightCamera;
 // пост-эффекты 
 static const uint32_t posteffectsCount = 7 + 3;
 static Posteffect posteffects[posteffectsCount] = {
-	// изначальные фильтры
+	// изначальные постэффекты
 	{VK_F1, "data/default_filters/normal.frag",     0},
 	{VK_F2, "data/default_filters/grayscale.frag",  0},
 	{VK_F3, "data/default_filters/sepia.frag",      0},
@@ -74,12 +74,52 @@ static Posteffect posteffects[posteffectsCount] = {
 	{VK_F5, "data/default_filters/blur.frag",       0},
 	{VK_F6, "data/default_filters/emboss.frag",     0},
 	{VK_F7, "data/default_filters/aberration.frag", 0},
-	// добавленные фильтры
+	// добавленные постэффекты
 	{VK_F8, "data/extra_filters/gamma.frag", 0},
 	{VK_F9, "data/extra_filters/edge.frag", 0},
 	{VK_F10, "data/extra_filters/log.frag", 0}
 };
 uint32_t posteffectChoice = 0;
+
+// фильтры
+
+// сглаживающие фильтры
+static const uint32_t blurFiltersCount = 2;
+static mat3 blurFilters[blurFiltersCount] = {
+	// усредняющий фильтр
+	mat3(1.0, 1.0, 1.0,
+		 1.0, 10.0, 1.0,
+		 1.0, 1.0, 1.0) / 9, 
+	// стандартный blur фильтр
+	mat3(1.0, 2.0, 1.0,
+		 2.0, 0.0, 2.0,
+		 1.0, 2.0, 1.0) / 16
+};
+uint32_t blurFilterChoice = 0;
+
+// контрсатоповышающие фильтры
+
+// разностные фильтры
+static const uint32_t edgeFiltersCount = 4;
+static mat3 edgeFilters[edgeFiltersCount] = {
+	mat3(2.0, 0.0, 0.0,
+		 0.0, -1.0, 0.0,
+	     0.0, 0.0, -1.0) / 2,
+	// оператор Прюитта
+	mat3(-1.0, 0.0, 1.0,
+		 -1.0, 0.0, 1.0,
+		 -1.0, 0.0, 1.0) / 3,
+	// оператор Собеля
+	mat3(-1.0, -2.0, -1.0,
+		  0.0, 0.0, 0.0,
+		  1.0, 2.0, 1.0) / 4,
+	// оператор Шарра
+	mat3(-3.0, 0.0, 3.0,
+		 -10.0, 0.0, 10.0,
+		 -3.0, 0.0, 3.0) / 16
+};
+uint32_t edgeFilterChoice = 0;
+uint32_t embossFilterChoice = 0;
 
 // вершины полноэкранного прямоугольника
 // координаты и текстурные координаты (текстура цвета)
@@ -322,10 +362,12 @@ void GLWindowRender(const GLWindow &window)
 	// устанавливаем параметр для различных фильтраций
 	ShaderSetFloat(posteffectProgram, "Gamma", posteffectGamma);
 	ShaderSetFloat(posteffectProgram, "EdgeThreshold", posteffectEdgeThreshold);
-	mat3 sobelKernel = mat3(1.0, 0.0, -1.0,
-							2.0, 0.0, -2.0,
-							1.0, 0.0, -1.0);
-	ShaderSetMatrix(posteffectProgram, "Kernel", sobelKernel);
+	switch (posteffectChoice)
+	{
+		case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
+		case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
+		case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
+	}
 	// выводим полноэкранный прямоугольник на экран
 	glBindVertexArray(fsqVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -400,8 +442,44 @@ void GLWindowInput(const GLWindow &window)
 	float diff= 0.01 * ((float)InputIsKeyDown(VK_UP) - (float)InputIsKeyDown(VK_DOWN));
 	if (posteffectGamma + diff > 0.0 && posteffectChoice >= 7)
 		posteffectGamma += diff;
-	if (posteffectEdgeThreshold + diff > 0.0 && posteffectChoice == 8)
-		posteffectEdgeThreshold += diff;
+
+	if (posteffectEdgeThreshold > 0.0 && posteffectChoice == 8)
+		posteffectEdgeThreshold -= 0.005 * (float)InputIsKeyDown(VK_DOWN);
+	if (posteffectEdgeThreshold < 1.0 && posteffectChoice == 8)
+		posteffectEdgeThreshold += 0.005 * (float)InputIsKeyDown(VK_UP);
+	
+	// выбор оператора для пространственных фильтраций
+	// осуществляется PageUp/PageDown
+	if (InputIsKeyPressed(VK_PRIOR))
+	{
+		switch (posteffectChoice)
+		{
+			case 4:
+				blurFilterChoice += (int)(blurFilterChoice < blurFiltersCount - 1);
+				break;
+			case 5:
+				embossFilterChoice += (int)(embossFilterChoice < edgeFiltersCount - 1);
+				break;
+			case 8:
+				edgeFilterChoice += (int)(edgeFilterChoice < edgeFiltersCount - 1);
+				break;
+		}
+	}
+	if (InputIsKeyPressed(VK_NEXT))
+	{
+		switch (posteffectChoice)
+		{
+			case 4:
+				blurFilterChoice -= (int)(blurFilterChoice > 0);
+				break;
+			case 5:
+				embossFilterChoice -= (int)(embossFilterChoice > 0);
+				break;
+			case 8:
+				edgeFilterChoice -= (int)(edgeFilterChoice > 0);
+				break;
+		}
+	}
 
 	moveDelta[0] = 10 * ((int)InputIsKeyDown('D') - (int)InputIsKeyDown('A'));
 	moveDelta[1] = 10 * ((int)InputIsKeyDown('S') - (int)InputIsKeyDown('W'));

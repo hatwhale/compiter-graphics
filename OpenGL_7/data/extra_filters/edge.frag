@@ -7,6 +7,9 @@ uniform float Border;
 // параметр выделения границ
 uniform float EdgeThreshold;
 
+// фильтр, находящий границы
+uniform mat3 Kernel;
+
 // параметры, полученные из вершинного шейдера
 in Vertex
 {
@@ -15,25 +18,32 @@ in Vertex
 
 layout(location = FRAG_OUTPUT0) out vec4 color;
 
-const vec3 factor = vec3(0.2126, 0.7152, 0.0722);
+// Ядро свертки
+#define KERNEL_SIZE 9
+
+const vec2 offset[KERNEL_SIZE] = vec2[](
+	vec2(-1.0,-1.0), vec2( 0.0,-1.0), vec2( 1.0,-1.0),
+	vec2(-1.0, 0.0), vec2( 0.0, 0.0), vec2( 1.0, 0.0),
+	vec2(-1.0, 1.0), vec2( 0.0, 1.0), vec2( 1.0, 1.0)
+);
+
+const vec3 factor = vec3(0.27, 0.67, 0.06);
 
 vec3 filter(in vec2 texcoord)
 {
-    float s00 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(-1, 1)).rgb);
-    float s10 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(-1, 0)).rgb);
-    float s20 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(-1, -1)).rgb);
-    float s01 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(0, 1)).rgb);
-    float s21 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(0, -1)).rgb);
-    float s02 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(1, 1)).rgb);
-    float s12 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(1, 0)).rgb);
-    float s22 = dot(factor, textureOffset(colorTexture, texcoord, ivec2(1, -1)).rgb);
+	vec2 pstep = vec2(1.0) / vec2(textureSize(colorTexture, 0));
 
-    float sx = s00 + 2 * s10 + s20 - (s02 + 2 * s12 + s22);
-    float sy = s00 + 2 * s01 + s02 - (s20 + 2 * s21 + s22);
+	vec3 dx = vec3(0.0), dy = vec3(0.0);
+	for (int i = 0; i < KERNEL_SIZE; ++i) {
+		dx += texture(colorTexture, texcoord + offset[i] * pstep).rgb * Kernel[i/3][i%3];
+		dy += texture(colorTexture, texcoord + offset[i] * pstep).rgb * Kernel[i%3][i/3];
+	}
+	float dist = dot(factor, sqrt(dx * dx + dy * dy));
 
-    float dist = sx * sx + sy * sy;
-
-    return vec3(dist > EdgeThreshold * EdgeThreshold);
+	if(dist > EdgeThreshold)
+		return 2.0 * vec3(dist);
+	else
+		return vec3(0.0);
 }
 
 void main()

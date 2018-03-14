@@ -5,6 +5,9 @@ uniform sampler2D colorTexture, depthTexture;
 // граница фильтрации
 uniform float Border;
 
+// сглаживающий фильтр
+uniform mat3 Kernel;
+
 // параметры, полученные из вершинного шейдера
 in Vertex
 {
@@ -15,13 +18,6 @@ layout(location = FRAG_OUTPUT0) out vec4 color;
 
 // Ядро свертки
 #define KERNEL_SIZE 9
-
-const float kernel[KERNEL_SIZE] = float[](
-	0.0625, 0.1250, 0.0625,
-	0.1250, 0.2500, 0.1250,
-	0.0625, 0.1250, 0.0625
-);
-
 const vec2 offset[KERNEL_SIZE] = vec2[](
 	vec2(-1.0,-1.0), vec2( 0.0,-1.0), vec2( 1.0,-1.0),
 	vec2(-1.0, 0.0), vec2( 0.0, 0.0), vec2( 1.0, 0.0),
@@ -34,7 +30,7 @@ vec3 filter(in vec2 texcoord)
 	vec4 res   = vec4(0.0);
 
 	for (int i = 0; i < KERNEL_SIZE; ++i)
-		res += texture(colorTexture, texcoord + offset[i] * pstep) * kernel[i];
+		res += texture(colorTexture, texcoord + offset[i] * pstep) * Kernel[i/3][i%3];
 
 	return vec3(res);
 }
