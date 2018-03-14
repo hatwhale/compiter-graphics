@@ -37,6 +37,8 @@ static GLuint depthProgram = 0, shadowmapProgram = 0, posteffectProgram = 0;
 
 // индексы текстур
 static GLuint colorTexture = 0, depthTexture = 0, posteffectTexture = 0, posteffectDepthTexture = 0;
+static GLuint posteffectTextures[2];
+static GLuint posteffectDepthTextures[2];
 
 // граница фильтрованного изображения
 float posteffectBorder = 0.5;
@@ -47,6 +49,7 @@ float posteffectEdgeThreshold = 0.2;
 
 // индекс FBO
 static GLuint depthFBO = 0, posteffectFBO = 0;
+static GLuint posteffectFBOs[2];
 
 // VAO и VBO для полноэкранного прямоугольника
 static GLuint fsqVAO = 0, fsqVBO = 0;
@@ -186,6 +189,14 @@ bool GLWindowInit(const GLWindow &window)
 		GL_UNSIGNED_BYTE, window.width, window.height);
 	posteffectDepthTexture = TextureCreateEmpty(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
 		GL_UNSIGNED_BYTE, window.width, window.height);
+	
+	for (int i = 0; i < 2; i++)
+	{
+		posteffectTextures[i] = TextureCreateEmpty(GL_RGBA8, GL_RGBA,
+			GL_UNSIGNED_BYTE, window.width, window.height);
+		posteffectDepthTextures[i] = TextureCreateEmpty(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,
+			GL_UNSIGNED_BYTE, window.width, window.height);
+	}
 
 	// создадим примитивы и настроим материалы
 	// плоскость под вращающимся тором
@@ -260,6 +271,28 @@ bool GLWindowInit(const GLWindow &window)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	// создаем FBO для множественной фильтрации
+	glGenFramebuffers(2, posteffectFBOs);
+
+	for (int i = 0; i < 2; i++)
+	{
+		// делаем созданный FBO текущим
+		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[i]);
+
+		// присоединяем текстуры к FBO
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, posteffectTextures[i], 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, posteffectDepthTextures[i], 0);
+
+		// проверим текущий FBO на корректность
+		if ((fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER)) != GL_FRAMEBUFFER_COMPLETE)
+		{
+			LOG_ERROR("glCheckFramebufferStatus error 0x%X\n", fboStatus);
+			return false;
+		}
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	// создадим VAO и VBO для рендера полноэкранного прямоугольника
 	glGenVertexArrays(1, &fsqVAO);
 	glBindVertexArray(fsqVAO);
@@ -311,6 +344,11 @@ void GLWindowClear(const GLWindow &window)
 	TextureDestroy(depthTexture);
 	TextureDestroy(posteffectTexture);
 	TextureDestroy(posteffectDepthTexture);
+	for (int i = 0; i < 2; i++)
+	{
+		TextureDestroy(posteffectTextures[i]);
+		TextureDestroy(posteffectDepthTextures[i]);
+	}
 
 	InputShowCursor(true);
 }
@@ -350,11 +388,39 @@ void GLWindowRender(const GLWindow &window)
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glCullFace(GL_BACK);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[0]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderScene(shadowmapProgram, mainCamera);
-	
+
+	bool pingpong = true;
+	for (int i = 0; i < 10; i++)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[pingpong]);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// устанавливаем шейдерную программу с реализацией экранного эффекта
+		ShaderProgramBind(posteffectProgram);
+		// устанавливаем текстуру сцены в 0-й текстурный юнит
+		TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
+		TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTextures[!pingpong]);
+		// устанавливаем границу фильтрованного изображения
+		ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
+		// устанавливаем параметр для различных фильтраций
+		ShaderSetFloat(posteffectProgram, "Gamma", posteffectGamma);
+		ShaderSetFloat(posteffectProgram, "EdgeThreshold", posteffectEdgeThreshold);
+		switch (posteffectChoice)
+		{
+		case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
+		case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
+		case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
+		}
+		// выводим полноэкранный прямоугольник на экран
+		glBindVertexArray(fsqVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		pingpong = !pingpong;
+	}
+
 	// устанавливаем дефолтный FBO активным
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -362,8 +428,8 @@ void GLWindowRender(const GLWindow &window)
 	// устанавливаем шейдерную программу с реализацией экранного эффекта
 	ShaderProgramBind(posteffectProgram);
 	// устанавливаем текстуру сцены в 0-й текстурный юнит
-	TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTexture);
-	TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTexture);
+	TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
+	TextureSetup(posteffectProgram, 2, "depthTexture", posteffectDepthTextures[!pingpong]);
 	// устанавливаем границу фильтрованного изображения
 	ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
 	// устанавливаем параметр для различных фильтраций
@@ -371,9 +437,9 @@ void GLWindowRender(const GLWindow &window)
 	ShaderSetFloat(posteffectProgram, "EdgeThreshold", posteffectEdgeThreshold);
 	switch (posteffectChoice)
 	{
-		case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
-		case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
-		case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
+	case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
+	case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
+	case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
 	}
 	// выводим полноэкранный прямоугольник на экран
 	glBindVertexArray(fsqVAO);
