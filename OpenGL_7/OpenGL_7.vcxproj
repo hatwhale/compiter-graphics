@@ -148,7 +148,9 @@
     <None Include="data\shaders\extra_filters\deferred.frag" />
     <None Include="data\shaders\extra_filters\edge.frag" />
     <None Include="data\shaders\extra_filters\gamma.frag" />
-    <None Include="data\shaders\extra_filters\log.frag" />
+    <None Include="data\shaders\extra_filters\add.frag" />
+    <None Include="data\shaders\extra_filters\mix.frag" />
+    <None Include="data\shaders\extra_filters\threshold.frag" />
     <None Include="data\shaders\posteffect.vert" />
     <None Include="data\shaders\shadowmap.frag" />
     <None Include="data\shaders\shadowmap.vert" />

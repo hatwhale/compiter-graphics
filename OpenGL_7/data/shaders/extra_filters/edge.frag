@@ -4,8 +4,6 @@ uniform sampler2D colorTexture, depthTexture;
 
 // граница фильтрации
 uniform float Border;
-// параметр выделения границ
-uniform float EdgeThreshold;
 
 // фильтр, находящий границы
 uniform mat3 Kernel;
@@ -27,8 +25,6 @@ const vec2 offset[KERNEL_SIZE] = vec2[](
 	vec2(-1.0, 1.0), vec2( 0.0, 1.0), vec2( 1.0, 1.0)
 );
 
-const vec3 factor = vec3(0.27, 0.67, 0.06);
-
 vec3 filter(in vec2 texcoord)
 {
 	vec2 pstep = vec2(1.0) / vec2(textureSize(colorTexture, 0));
@@ -38,12 +34,7 @@ vec3 filter(in vec2 texcoord)
 		dx += texture(colorTexture, texcoord + offset[i] * pstep).rgb * Kernel[i/3][i%3];
 		dy += texture(colorTexture, texcoord + offset[i] * pstep).rgb * Kernel[i%3][i/3];
 	}
-	float dist = dot(factor, sqrt(dx * dx + dy * dy));
-
-	if(dist > EdgeThreshold)
-		return 2.0 * vec3(dist);
-	else
-		return vec3(0.0);
+	return sqrt(dx * dx + dy * dy);
 }
 
 void main()
