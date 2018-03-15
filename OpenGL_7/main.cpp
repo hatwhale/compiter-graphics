@@ -401,43 +401,12 @@ void GLWindowRender(const GLWindow &window)
 	RenderScene(shadowmapProgram, mainCamera);
 
 	GLuint posteffectProgram;
-	bool pingpong = true;
-	if (!sumPosteffects)
+	bool pingpong = true, firstiter = true;
+	for (int p = 0; p < posteffectsCount + posteffectBlurRepeat - 1; p++)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[posteffectFBOsCount - 1]);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// устанавливаем шейдерную программу с реализацией экранного эффекта
-		posteffectProgram = posteffectChoice == -1 ? colorPosteffects[colorPosteffectChoice].program : 
-			posteffects[posteffectChoice].program;
-		ShaderProgramBind(posteffectProgram);
-		// устанавливаем параметры фильтрованного изображения
-		TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
-		TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[!pingpong]);
-		ShaderSetMatrix(posteffectProgram, "Correct", correctFilters[correctFilterChoice]);
-		switch (posteffectChoice)
+		int pos_i = p < posteffectBlurRepeat ? 0 : p - posteffectBlurRepeat + 1;
+		if (InputIsKeyDown(posteffects[pos_i].key) || pos_i == posteffectChoice)
 		{
-			case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
-			case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
-			case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
-		}
-		glBindVertexArray(fsqVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
-		pingpong = !pingpong;
-	}
-	else
-	{
-		bool firstiter = true;
-		for (int p = 0; p < posteffectsCount; p++)
-		{
-			if (InputIsKeyPressed(colorPosteffects[colorPosteffectChoice].key))
-			{
-
-			}
-			if (InputIsKeyPressed(posteffects[p].key))
-			{
-
-			}
 			glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[pingpong]);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			// устанавливаем шейдерную программу с реализацией экранного эффекта
@@ -456,8 +425,7 @@ void GLWindowRender(const GLWindow &window)
 			}
 			// устанавливаем параметры фильтрованного изображения
 			ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
-			ShaderSetMatrix(posteffectProgram, "Correct", correctFilters[correctFilterChoice]);
-			switch (p)
+			switch (pos_i)
 			{
 				case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
 				case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
@@ -470,6 +438,8 @@ void GLWindowRender(const GLWindow &window)
 			pingpong = !pingpong;
 			firstiter = false;
 		}
+		if (pos_i > posteffectChoice)
+			break;
 	}
 
 	// устанавливаем дефолтный FBO активным
