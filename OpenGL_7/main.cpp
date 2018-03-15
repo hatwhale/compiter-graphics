@@ -94,7 +94,7 @@ static Posteffect posteffects[posteffectsCount] = {
 	{VK_F2, "data/shaders/extra_filters/threshold.frag", 0},
 	{VK_F4, "data/shaders/extra_filters/edge.frag", 0}
 };
-uint32_t posteffectChoice = 0;
+int32_t posteffectChoice = -1;
 
 static Posteffect mixPosteffect = { VK_END, "data/shaders/extra_filters/mix.frag", 0 };
 
@@ -205,6 +205,11 @@ bool GLWindowInit(const GLWindow &window)
 		if (colorPosteffects[p].program == 0)
 			return false;
 	}
+
+	mixPosteffect.program = ShaderProgramCreateFromFile("data/shaders/posteffect.vert", mixPosteffect.shader);
+
+	if (mixPosteffect.program == 0)
+		return false;
 
 	// настроим направленный источник освещения
 	LightDefault(directionalLight, LT_DIRECTIONAL);
@@ -410,13 +415,35 @@ void GLWindowRender(const GLWindow &window)
 	//posteffectProgram = colorPosteffects[colorPosteffectChoice].program;
 	//ShaderSetMatrix(posteffectProgram, "Correct", correctFilters[correctFilterChoice]);
 	bool pingpong = true, first_iter = true;
-	for (int p = 0; p < 1; p++)
+	for (int p = 0; p < posteffectBlurRepeat; p++)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[pingpong]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		// устанавливаем шейдерную программу с реализацией экранного эффекта
-		posteffectProgram = posteffects[posteffectChoice].program;
-		ShaderProgramBind(posteffectProgram);
+		// устанавливаем параметры фильтрованного изображения
+		if (posteffectChoice == -1)
+		{
+			posteffectProgram = colorPosteffects[colorPosteffectChoice].program;
+			ShaderProgramBind(posteffectProgram);
+			ShaderSetFloat(posteffectProgram, "Border", posteffectColorBorder);
+			ShaderSetMatrix(posteffectProgram, "Correct", correctFilters[correctFilterChoice]);
+		}
+		else
+		{
+			posteffectProgram = posteffects[posteffectChoice].program;
+			ShaderProgramBind(posteffectProgram);
+			ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
+			switch (posteffectChoice)
+			{
+
+				case 0: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
+				case 1: ShaderSetMatrix(posteffectProgram, "Kernel", embossFilters[embossFilterChoice]); break;
+				case 3: ShaderSetFloat(posteffectProgram, "Threshold", posteffectThreshold); break;
+				case 4: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
+			}
+		}
+
 		// устанавливаем текстуру сцены в 0-й текстурный юнит
 		if (first_iter)
 		{
@@ -428,14 +455,7 @@ void GLWindowRender(const GLWindow &window)
 			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
 			TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[!pingpong]);
 		}
-		// устанавливаем границу фильтрованного изображения
-		ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
-		switch (posteffectChoice)
-		{
-		case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
-		case 5: ShaderSetMatrix(posteffectProgram, "Kernel", embossFilters[embossFilterChoice]); break;
-		case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
-		}
+
 		// выводим полноэкранный прямоугольник на экран
 		glBindVertexArray(fsqVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -514,6 +534,8 @@ void GLWindowInput(const GLWindow &window)
 	for (uint32_t p = 0; p < posteffectsCount; ++p)
 		if (InputIsKeyPressed(posteffects[p].key))
 			posteffectChoice = p;
+	if (InputIsKeyPressed(VK_F1))
+		posteffectChoice = -1;
 
 	// переключение между оконным и полноэкранным режимом
 	// осуществляется по нажатию комбинации Alt+Enter
@@ -525,32 +547,36 @@ void GLWindowInput(const GLWindow &window)
 	float diff = (float)InputIsKeyDown(VK_RIGHT) - (float)InputIsKeyDown(VK_LEFT);
 	if (posteffectBorder + 0.01 * diff > 0.0 && posteffectBorder + 0.01 * diff < 1.0)
 		posteffectBorder += 0.01 * diff;
-	posteffectColorBorder = InputIsKeyDown(VK_MENU) && InputIsKeyPressed(VK_F1) ? 1.0 : posteffectBorder;
+	posteffectColorBorder = InputIsKeyDown(VK_MENU) ? 1.0 : posteffectBorder;
 
 	// изменение параметра для различных фильтраций
 	// осуществляется стрелками вверх/вниз
 	diff = (float)InputIsKeyDown(VK_UP) - (float)InputIsKeyDown(VK_DOWN);
+	//if (InputIsKeyPressed(VK_UP) || InputIsKeyPressed(VK_DOWN))
 	if (InputIsKeyDown('G') && posteffectGamma + 0.01 * diff > 0.0)
 		posteffectGamma += 0.01 * diff;
-	if (InputIsKeyDown('M') && posteffectMixCoef + 0.01 * diff > 0.0 && posteffectMixCoef + 0.01 * diff < 2.0)
+	else if (InputIsKeyDown('M') && posteffectMixCoef + 0.01 * diff > 0.0 && posteffectMixCoef + 0.01 * diff < 2.0)
 		posteffectMixCoef += 0.01 * diff;
-	if (InputIsKeyDown(VK_F2) && posteffectThreshold + 0.005 * diff > 0.0 && posteffectThreshold + 0.005 * diff < 1.0)
+	else if (posteffectChoice == 3 && posteffectThreshold + 0.005 * diff > 0.0 && posteffectThreshold + 0.005 * diff < 1.0)
 		posteffectThreshold += 0.005 * diff;
-	if (InputIsKeyDown(VK_F3) && posteffectBlurRepeat + (int)diff > 0)
+	else if (posteffectChoice == 0 && posteffectBlurRepeat + (int)diff > 0)
 		posteffectBlurRepeat += (int)diff;
 	
 	// выбор оператора для пространственных фильтраций
 	// осуществляется PageUp/PageDown
 	int mode_diff = (int)InputIsKeyPressed(VK_PRIOR) - (int)InputIsKeyPressed(VK_NEXT);
-	if (InputIsKeyDown(VK_F3))
+	if (posteffectChoice == -1)
+		colorPosteffectChoice += colorPosteffectsCount + mode_diff;
+	else if (posteffectChoice == 0)
 		blurFilterChoice += blurFiltersCount + mode_diff;
-	if (InputIsKeyDown(VK_F4))
-		edgeFilterChoice += edgeFiltersCount + mode_diff;
-	if (InputIsKeyDown(VK_F5))
+	else if (posteffectChoice == 1)
 		embossFilterChoice += embossFiltersCount + mode_diff;
+	else if (posteffectChoice == 5)
+		edgeFilterChoice += edgeFiltersCount + mode_diff;
+	colorPosteffectChoice %= colorPosteffectsCount;
 	blurFilterChoice %= blurFiltersCount;
-	edgeFilterChoice %= edgeFiltersCount;
 	embossFilterChoice %= embossFiltersCount;
+	edgeFilterChoice %= edgeFiltersCount;
 
 	moveDelta[0] = 10 * ((int)InputIsKeyDown('D') - (int)InputIsKeyDown('A'));
 	moveDelta[1] = 10 * ((int)InputIsKeyDown('S') - (int)InputIsKeyDown('W'));
