@@ -143,13 +143,10 @@
     <None Include="data\shaders\default_filters\sepia.frag" />
     <None Include="data\shaders\depth.frag" />
     <None Include="data\shaders\depth.vert" />
-    <None Include="data\shaders\extra_filters\bloom.frag" />
-    <None Include="data\shaders\extra_filters\centroid.frag" />
     <None Include="data\shaders\extra_filters\correct.frag" />
     <None Include="data\shaders\extra_filters\deferred.frag" />
     <None Include="data\shaders\extra_filters\edge.frag" />
     <None Include="data\shaders\extra_filters\gamma.frag" />
-    <None Include="data\shaders\extra_filters\add.frag" />
     <None Include="data\shaders\extra_filters\mix.frag" />
     <None Include="data\shaders\extra_filters\threshold.frag" />
     <None Include="data\shaders\posteffect.vert" />
