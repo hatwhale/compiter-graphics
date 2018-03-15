@@ -5,7 +5,7 @@ uniform sampler2D colorTexture, depthTexture;
 // граница фильтрации
 uniform float Border;
 // корректирующая матрица
-unifrom mat3 Correct;
+uniform mat3 Correct;
 
 // параметры полученные из вершинного шейдера
 in Vertex
