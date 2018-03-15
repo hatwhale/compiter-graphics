@@ -1,4 +1,4 @@
-﻿// F2
+﻿// F1
 // текстуры
 uniform sampler2D colorTexture, depthTexture;
 

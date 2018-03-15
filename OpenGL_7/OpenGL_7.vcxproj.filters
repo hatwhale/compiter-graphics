@@ -114,12 +114,6 @@
     <None Include="data\shaders\default_filters\sepia.frag">
       <Filter>Resource Files\deafult filters</Filter>
     </None>
-    <None Include="data\shaders\extra_filters\bloom.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
-    <None Include="data\shaders\extra_filters\centroid.frag">
-      <Filter>Resource Files\extra filters</Filter>
-    </None>
     <None Include="data\shaders\extra_filters\deferred.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
@@ -150,10 +144,10 @@
     <None Include="data\shaders\extra_filters\mix.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
-    <None Include="data\shaders\extra_filters\add.frag">
+    <None Include="data\shaders\extra_filters\correct.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
-    <None Include="data\shaders\extra_filters\correct.frag">
+    <None Include="warp.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
   </ItemGroup>
