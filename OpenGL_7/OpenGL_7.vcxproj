@@ -145,6 +145,7 @@
     <None Include="data\shaders\depth.vert" />
     <None Include="data\shaders\extra_filters\bloom.frag" />
     <None Include="data\shaders\extra_filters\centroid.frag" />
+    <None Include="data\shaders\extra_filters\correct.frag" />
     <None Include="data\shaders\extra_filters\deferred.frag" />
     <None Include="data\shaders\extra_filters\edge.frag" />
     <None Include="data\shaders\extra_filters\gamma.frag" />

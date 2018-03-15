@@ -33,7 +33,7 @@ struct fsqVertex
 };
 
 // индекс шейдерной программы
-static GLuint depthProgram = 0, shadowmapProgram = 0, posteffectProgram = 0;
+static GLuint depthProgram = 0, shadowmapProgram = 0;
 
 // индекс FBO
 static GLuint depthFBO = 0;
@@ -46,6 +46,7 @@ static GLuint posteffectTextures[posteffectFBOsCount];
 static GLuint posteffectDepthTextures[posteffectFBOsCount];
 
 // граница фильтрованного изображения
+float posteffectColorBorder = 0.5;
 float posteffectBorder = 0.5;
 
 // параметры для фильтраций
@@ -71,33 +72,35 @@ static Light  directionalLight;
 static Camera mainCamera, lightCamera;
 
 // пост-эффекты 
-static Posteffect colorPosteffects[4] = {
+static const uint32_t colorPosteffectsCount = 5;
+static Posteffect colorPosteffects[colorPosteffectsCount] = {
 	// изначальные постэффекты
 	{ VK_F1, "data/shaders/default_filters/normal.frag",     0 },
-	{ VK_F2, "data/shaders/default_filters/grayscale.frag",  0 },
-	{ VK_F3, "data/shaders/default_filters/sepia.frag",      0 },
-	{ VK_F4, "data/shaders/default_filters/inverse.frag",    0 }
+	{ VK_F1, "data/shaders/default_filters/grayscale.frag",  0 },
+	{ VK_F1, "data/shaders/default_filters/sepia.frag",      0 },
+	{ VK_F1, "data/shaders/default_filters/inverse.frag",    0 },
+	// добавленные постэффекты
+	{ VK_F1, "data/shaders/default_filters/correct.frag",	 0 }
 };
+uint32_t colorPosteffectChoice = 0;
 
-static const uint32_t posteffectsCount = 7 + 3;
+static const uint32_t posteffectsCount = 5;
 static Posteffect posteffects[posteffectsCount] = {
 	// изначальные постэффекты
-	{VK_F1, "data/shaders/default_filters/normal.frag",     0},
-	{VK_F2, "data/shaders/default_filters/grayscale.frag",  0},
-	{VK_F3, "data/shaders/default_filters/sepia.frag",      0},
-	{VK_F4, "data/shaders/default_filters/inverse.frag",    0},
-	{VK_F5, "data/shaders/default_filters/blur.frag",       0},
-	{VK_F6, "data/shaders/default_filters/emboss.frag",     0},
-	{VK_F7, "data/shaders/default_filters/aberration.frag", 0},
+	{VK_F3, "data/shaders/default_filters/blur.frag",       0},
+	{VK_F5, "data/shaders/default_filters/emboss.frag",     0},
+	{VK_F6, "data/shaders/default_filters/aberration.frag", 0},
 	// добавленные постэффекты
-	{VK_F8, "data/shaders/extra_filters/threshold.frag", 0},
-	{VK_F9, "data/shaders/extra_filters/edge.frag", 0},
-	{VK_F10, "data/shaders/extra_filters/mix.frag", 0}
+	{VK_F2, "data/shaders/extra_filters/threshold.frag", 0},
+	{VK_F4, "data/shaders/extra_filters/edge.frag", 0}
 };
-uint32_t posteffectChoice = 0;
+int32_t posteffectChoice = 0;
+
+static Posteffect mixPosteffect = { VK_END, "data/shaders/extra_filters/mix.frag", 0 };
+
+bool sumPosteffects = false;
 
 // фильтры
-
 // сглаживающие фильтры
 static const uint32_t blurFiltersCount = 3;
 static mat3 blurFilters[blurFiltersCount] = {
@@ -148,6 +151,14 @@ static mat3 embossFilters[embossFiltersCount] = {
 };
 uint32_t embossFilterChoice = 0;
 
+static const uint32_t correctFiltersCount = 4;
+static mat3 correctFilters[correctFiltersCount] = {
+	mat3(0.412453,  0.357580,  0.180423,
+		 0.212671,  0.715160,  0.072169,
+		 0.019334,  0.119193,  0.950227)
+};
+uint32_t correctFilterChoice = 0;
+
 // вершины полноэкранного прямоугольника
 // координаты и текстурные координаты (текстура цвета)
 const fsqVertex fsqVertices[6] = {
@@ -188,8 +199,6 @@ bool GLWindowInit(const GLWindow &window)
 		if (posteffects[p].program == 0)
 			return false;
 	}
-
-	posteffectProgram = posteffects[0].program;
 
 	// настроим направленный источник освещения
 	LightDefault(directionalLight, LT_DIRECTIONAL);
@@ -386,43 +395,81 @@ void GLWindowRender(const GLWindow &window)
 	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 	glCullFace(GL_BACK);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[2]);
+	glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[posteffectFBOsCount - 1]);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	RenderScene(shadowmapProgram, mainCamera);
 
-	bool pingpong = true, first_iter = true;
-	for (int i = 0; i < posteffectBlurRepeat; i++)
+	GLuint posteffectProgram;
+	bool pingpong = true;
+	if (!sumPosteffects)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[pingpong]);
+		glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[posteffectFBOsCount - 1]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// устанавливаем шейдерную программу с реализацией экранного эффекта
+		posteffectProgram = posteffectChoice == -1 ? colorPosteffects[colorPosteffectChoice].program : 
+			posteffects[posteffectChoice].program;
 		ShaderProgramBind(posteffectProgram);
-		// устанавливаем текстуру сцены в 0-й текстурный юнит
-		if (first_iter)
-		{
-			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[posteffectFBOsCount - 1]);
-			TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[posteffectFBOsCount - 1]);
-		}
-		else
-		{
-			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
-			TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[!pingpong]);
-		}
-		// устанавливаем границу фильтрованного изображения
-		ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
+		// устанавливаем параметры фильтрованного изображения
+		TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
+		TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[!pingpong]);
+		ShaderSetMatrix(posteffectProgram, "Correct", correctFilters[correctFilterChoice]);
 		switch (posteffectChoice)
 		{
-		case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
-		case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
-		case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
+			case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
+			case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
+			case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
 		}
-		// выводим полноэкранный прямоугольник на экран
 		glBindVertexArray(fsqVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		pingpong = !pingpong;
-		first_iter = false;
+	}
+	else
+	{
+		bool firstiter = true;
+		for (int p = 0; p < posteffectsCount; p++)
+		{
+			if (InputIsKeyPressed(colorPosteffects[colorPosteffectChoice].key))
+			{
+
+			}
+			if (InputIsKeyPressed(posteffects[p].key))
+			{
+
+			}
+			glBindFramebuffer(GL_FRAMEBUFFER, posteffectFBOs[pingpong]);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			// устанавливаем шейдерную программу с реализацией экранного эффекта
+			posteffectProgram = posteffects[posteffectChoice].program;
+			ShaderProgramBind(posteffectProgram);
+			// устанавливаем текстуру сцены в 0-й текстурный юнит
+			if (firstiter)
+			{
+				TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[posteffectFBOsCount - 1]);
+				TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[posteffectFBOsCount - 1]);
+			}
+			else
+			{
+				TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[!pingpong]);
+				TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[!pingpong]);
+			}
+			// устанавливаем параметры фильтрованного изображения
+			ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
+			ShaderSetMatrix(posteffectProgram, "Correct", correctFilters[correctFilterChoice]);
+			switch (p)
+			{
+				case 4: ShaderSetMatrix(posteffectProgram, "Kernel", blurFilters[blurFilterChoice]); break;
+				case 5: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[embossFilterChoice]); break;
+				case 8: ShaderSetMatrix(posteffectProgram, "Kernel", edgeFilters[edgeFilterChoice]); break;
+			}
+			// выводим полноэкранный прямоугольник на экран
+			glBindVertexArray(fsqVAO);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			pingpong = !pingpong;
+			firstiter = false;
+		}
 	}
 
 	// устанавливаем дефолтный FBO активным
@@ -431,16 +478,16 @@ void GLWindowRender(const GLWindow &window)
 
 	// устанавливаем шейдерную программу с реализацией экранного эффекта
 
-	ShaderProgramBind(posteffects[9].program);
+	ShaderProgramBind(mixPosteffect.program);
 	// устанавливаем текстуру сцены в 0-й текстурный юнит
-	TextureSetup(posteffects[9].program, 0, "originColorTex", posteffectTextures[posteffectFBOsCount - 1]);
-	TextureSetup(posteffects[9].program, 1, "originDepthTex", posteffectDepthTextures[posteffectFBOsCount - 1]);
-	TextureSetup(posteffects[9].program, 2, "newColorTex", posteffectTextures[!pingpong]);
-	TextureSetup(posteffects[9].program, 3, "newDepthTex", posteffectDepthTextures[!pingpong]);
+	TextureSetup(mixPosteffect.program, 0, "originColorTex", posteffectTextures[posteffectFBOsCount - 1]);
+	TextureSetup(mixPosteffect.program, 1, "originDepthTex", posteffectDepthTextures[posteffectFBOsCount - 1]);
+	TextureSetup(mixPosteffect.program, 2, "newColorTex", posteffectTextures[!pingpong]);
+	TextureSetup(mixPosteffect.program, 3, "newDepthTex", posteffectDepthTextures[!pingpong]);
 	// устанавливаем параметр для различных фильтраций
-	ShaderSetFloat(posteffectProgram, "Border", posteffectBorder);
-	ShaderSetFloat(posteffects[9].program, "Gamma", posteffectGamma);
-	ShaderSetFloat(posteffects[9].program, "MixCoef", posteffectMixCoef);
+	ShaderSetFloat(mixPosteffect.program, "Border", posteffectBorder);
+	ShaderSetFloat(mixPosteffect.program, "Gamma", posteffectGamma);
+	ShaderSetFloat(mixPosteffect.program, "MixCoef", posteffectMixCoef);
 	// выводим полноэкранный прямоугольник на экран
 	glBindVertexArray(fsqVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -493,10 +540,9 @@ void GLWindowInput(const GLWindow &window)
 
 	for (uint32_t p = 0; p < posteffectsCount; ++p)
 		if (InputIsKeyPressed(posteffects[p].key))
-		{
-			posteffectProgram = posteffects[p].program;
 			posteffectChoice = p;
-		}
+	if (InputIsKeyPressed(VK_F1))
+		posteffectChoice = -1;
 
 	// переключение между оконным и полноэкранным режимом
 	// осуществляется по нажатию комбинации Alt+Enter
@@ -505,35 +551,38 @@ void GLWindowInput(const GLWindow &window)
 
 	// сдвиг границы фильтрации изображения
 	// осуществляется стрелками влево/вправо
-	if (posteffectBorder > 0.0 && posteffectChoice != 0)
-		posteffectBorder -= 0.01 * (float)InputIsKeyDown(VK_LEFT);
-	if (posteffectBorder < 1.0 && posteffectChoice != 0)
-		posteffectBorder += 0.01 * (float)InputIsKeyDown(VK_RIGHT);
+	float diff = (float)InputIsKeyDown(VK_RIGHT) - (float)InputIsKeyDown(VK_LEFT);
+	if (posteffectBorder + 0.01 * diff > 0.0 && posteffectBorder + 0.01 * diff < 1.0)
+		posteffectBorder += 0.01 * diff;
+	posteffectColorBorder = InputIsKeyDown(VK_MENU) && InputIsKeyPressed(VK_F1) ? 1.0 : posteffectBorder;
 
 	// изменение параметра для различных фильтраций
 	// осуществляется стрелками вверх/вниз
-	float diff = (float)InputIsKeyDown(VK_UP) - (float)InputIsKeyDown(VK_DOWN);
-	if (InputIsKeyDown('G') && posteffectGamma + diff > 0.0)
+	diff = (float)InputIsKeyDown(VK_UP) - (float)InputIsKeyDown(VK_DOWN);
+	if (InputIsKeyDown('G') && posteffectGamma + 0.01 * diff > 0.0)
 		posteffectGamma += 0.01 * diff;
-	if (InputIsKeyDown('M') && posteffectMixCoef + diff > 0.0 && posteffectMixCoef + diff < 2.0)
+	if (InputIsKeyDown('M') && posteffectMixCoef + 0.01 * diff > 0.0 && posteffectMixCoef + 0.01 * diff < 2.0)
 		posteffectMixCoef += 0.01 * diff;
-	if (InputIsKeyDown(VK_F8) && posteffectThreshold + diff > 0.0 && posteffectThreshold + diff < 1.0)
+	if (InputIsKeyDown(VK_F2) && posteffectThreshold + 0.005 * diff > 0.0 && posteffectThreshold + 0.005 * diff < 1.0)
 		posteffectThreshold += 0.005 * diff;
-	if (InputIsKeyDown(VK_F5) && posteffectBlurRepeat + diff > 0)
+	if (InputIsKeyDown(VK_F3) && posteffectBlurRepeat + (int)diff > 0)
 		posteffectBlurRepeat += (int)diff;
 	
 	// выбор оператора для пространственных фильтраций
 	// осуществляется PageUp/PageDown
 	int mode_diff = (int)InputIsKeyPressed(VK_PRIOR) - (int)InputIsKeyPressed(VK_NEXT);
-	if (InputIsKeyDown(VK_F5))
+	if (InputIsKeyDown(VK_F1))
+		colorPosteffectChoice += colorPosteffectsCount + mode_diff;
+	if (InputIsKeyDown(VK_F3))
 		blurFilterChoice += blurFiltersCount + mode_diff;
-	if (InputIsKeyDown(VK_F6))
-		embossFilterChoice += embossFiltersCount + mode_diff;
-	if (InputIsKeyDown(VK_F9))
+	if (InputIsKeyDown(VK_F4))
 		edgeFilterChoice += edgeFiltersCount + mode_diff;
+	if (InputIsKeyDown(VK_F5))
+		embossFilterChoice += embossFiltersCount + mode_diff;
+	colorPosteffectChoice %= colorPosteffectsCount;
 	blurFilterChoice %= blurFiltersCount;
-	embossFilterChoice %= embossFiltersCount;
 	edgeFilterChoice %= edgeFiltersCount;
+	embossFilterChoice %= embossFiltersCount;
 
 	moveDelta[0] = 10 * ((int)InputIsKeyDown('D') - (int)InputIsKeyDown('A'));
 	moveDelta[1] = 10 * ((int)InputIsKeyDown('S') - (int)InputIsKeyDown('W'));
