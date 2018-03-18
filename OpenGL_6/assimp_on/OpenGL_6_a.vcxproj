@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{8D2C3E3E-5786-4C22-A6A1-394687325F05}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\x64\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\Ilya\OpenGL\Includes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Ilya\OpenGL\Libs\x64\Release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="assimp_model.cpp" />
+    <ClCompile Include="dirLight.cpp" />
+    <ClCompile Include="flyingCamera.cpp" />
+    <ClCompile Include="framebuffer.cpp" />
+    <ClCompile Include="freeTypeFont.cpp" />
+    <ClCompile Include="heightmap.cpp" />
+    <ClCompile Include="material.cpp" />
+    <ClCompile Include="md2model.cpp" />
+    <ClCompile Include="openGLControl.cpp" />
+    <ClCompile Include="particle_system_tf.cpp" />
+    <ClCompile Include="renderScene.cpp" />
+    <ClCompile Include="shaders.cpp" />
+    <ClCompile Include="skybox.cpp" />
+    <ClCompile Include="static_geometry.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="vertexBufferObject.cpp" />
+    <ClCompile Include="win_OpenGLApp.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="anorms.h" />
+    <ClInclude Include="assimp_model.h" />
+    <ClInclude Include="common_header.h" />
+    <ClInclude Include="dirLight.h" />
+    <ClInclude Include="flyingCamera.h" />
+    <ClInclude Include="framebuffer.h" />
+    <ClInclude Include="freeTypeFont.h" />
+    <ClInclude Include="heightmap.h" />
+    <ClInclude Include="material.h" />
+    <ClInclude Include="md2model.h" />
+    <ClInclude Include="openGLControl.h" />
+    <ClInclude Include="particle_system_tf.h" />
+    <ClInclude Include="shaders.h" />
+    <ClInclude Include="skybox.h" />
+    <ClInclude Include="static_geometry.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="vertexBufferObject.h" />
+    <ClInclude Include="win_OpenGLApp.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\shaders\dirLight.frag" />
+    <None Include="data\shaders\font2D.frag" />
+    <None Include="data\shaders\main_shader.frag" />
+    <None Include="data\shaders\main_shader.vert" />
+    <None Include="data\shaders\md2anim.vert" />
+    <None Include="data\shaders\normal_displayer.frag" />
+    <None Include="data\shaders\normal_displayer.geom" />
+    <None Include="data\shaders\normal_displayer.vert" />
+    <None Include="data\shaders\ortho2D.frag" />
+    <None Include="data\shaders\ortho2D.vert" />
+    <None Include="data\shaders\particles_render.frag" />
+    <None Include="data\shaders\particles_render.geom" />
+    <None Include="data\shaders\particles_render.vert" />
+    <None Include="data\shaders\particles_update.frag" />
+    <None Include="data\shaders\particles_update.geom" />
+    <None Include="data\shaders\particles_update.vert" />
+    <None Include="data\shaders\shadowMapper.frag" />
+    <None Include="data\shaders\shadowMapper.geom" />
+    <None Include="data\shaders\shadowMapper.vert" />
+    <None Include="data\shaders\shadowMapRender.frag" />
+    <None Include="data\shaders\shadowMapRender.vert" />
+    <None Include="data\shaders\shadows.frag" />
+    <None Include="data\shaders\skybox.frag" />
+    <None Include="data\shaders\skybox.vert" />
+    <None Include="data\shaders\terrain.frag" />
+    <None Include="data\shaders\terrain.vert" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

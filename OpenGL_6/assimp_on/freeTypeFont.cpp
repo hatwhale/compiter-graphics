@@ -4,11 +4,13 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#ifdef _DEBUG
-#pragma comment(lib, "freetype263d.lib")
-#else
-#pragma comment(lib, "freetype263.lib")
-#endif
+//#ifdef _DEBUG
+//#pragma comment(lib, "freetype263d.lib")
+//#else
+//#pragma comment(lib, "freetype263.lib")
+//#endif
+
+#pragma comment(lib, "freetype.lib")
 
 using namespace std;
 

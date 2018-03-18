@@ -169,6 +169,8 @@ bool COpenGLWinApp::CreateAppWindow(string sTitle)
 		hWnd = CreateWindowEx(0, sAppName.c_str(), sTitle.c_str(), WS_POPUP | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, // This is the commonly used style for fullscreen
 		0, 0, dmSettings.dmPelsWidth, dmSettings.dmPelsHeight, NULL,
 		NULL, hInstance, NULL);
+
+		ShowCursor(false);
 	}
 	else hWnd = CreateWindowEx(0, sAppName.c_str(), sTitle.c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		0, 0, CW_USEDEFAULT, CW_USEDEFAULT, NULL,

@@ -15,11 +15,13 @@ class CTexture
 public:
 	void CreateEmptyTexture(int a_iWidth, int a_iHeight);
 	void CreateDepthTexture(int a_iWidth, int a_iHeight);
+	void CreateDepthTexture(int a_iWidth, int a_iHeight, int a_iDepth);
 	void CreateRotationTexture(int a_iWidth, int a_iHeight);
 	void CreateFromData(BYTE* bData, int a_iWidth, int a_iHeight, int a_iBPP, GLenum format);
 
 	bool LoadTexture2D(string a_sPath);
 	void BindTexture(int iTextureUnit = 0);
+	void BindTextureArray(int iTextureUnit = 0);
 
 	UINT GetTextureID();
 

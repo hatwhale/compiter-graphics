@@ -35,7 +35,7 @@ bool PrepareShaderPrograms()
 
 	string sShaderFileNames[] = {"main_shader.vert", "main_shader.frag", "ortho2D.vert", "ortho2D.frag", "font2D.frag", "dirLight.frag",
 		"normal_displayer.vert", "normal_displayer.geom", "normal_displayer.frag", "md2anim.vert", "skybox.vert", "skybox.frag",
-		"shadowMapper.vert", "shadowMapper.frag", "shadowMapRender.vert", "shadowMapRender.frag", "shadows.frag"
+		"shadowMapper.vert", "shadowMapper.geom", "shadowMapper.frag", "shadowMapRender.vert", "shadowMapRender.frag", "shadows.frag"
 	};
 
 	FOR(i, NUMSHADERS)
@@ -51,7 +51,7 @@ bool PrepareShaderPrograms()
 		spMain.AddShaderToProgram(&shShaders[0]);
 		spMain.AddShaderToProgram(&shShaders[1]);
 		spMain.AddShaderToProgram(&shShaders[5]);
-		spMain.AddShaderToProgram(&shShaders[16]); // Add shadows support
+		spMain.AddShaderToProgram(&shShaders[17]); // Add shadows support
 	if(!spMain.LinkProgram())return false;
 
 	spOrtho2D.CreateProgram();
@@ -74,7 +74,7 @@ bool PrepareShaderPrograms()
 		spMD2Animation.AddShaderToProgram(&shShaders[9]);
 		spMD2Animation.AddShaderToProgram(&shShaders[1]);
 		spMD2Animation.AddShaderToProgram(&shShaders[5]);
-		spMD2Animation.AddShaderToProgram(&shShaders[16]);
+		spMD2Animation.AddShaderToProgram(&shShaders[17]);
 	if(!spMD2Animation.LinkProgram())return false;
 
 
@@ -86,11 +86,12 @@ bool PrepareShaderPrograms()
 	spShadowMapper.CreateProgram();
 		spShadowMapper.AddShaderToProgram(&shShaders[12]);
 		spShadowMapper.AddShaderToProgram(&shShaders[13]);
+		spShadowMapper.AddShaderToProgram(&shShaders[14]);
 	if(!spShadowMapper.LinkProgram())return false;
 
 	spShadowMapRender.CreateProgram();
-		spShadowMapRender.AddShaderToProgram(&shShaders[14]);
 		spShadowMapRender.AddShaderToProgram(&shShaders[15]);
+		spShadowMapRender.AddShaderToProgram(&shShaders[16]);
 	if(!spShadowMapRender.LinkProgram())return false;
 
 	return true;
@@ -485,6 +486,14 @@ void CShaderProgram::SetUniform(string sName, const int iValue)
 {
 	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
 	glUniform1i(iLoc, iValue);
+}
+
+// Setting bools
+
+void CShaderProgram::SetUniform(string sName, const bool bValue)
+{
+	int iLoc = glGetUniformLocation(uiProgram, sName.c_str());
+	glUniform1i(iLoc, bValue);
 }
 
 void CShaderProgram::SetModelAndNormalMatrix(string sModelMatrixName, string sNormalMatrixName, glm::mat4 mModelMatrix)

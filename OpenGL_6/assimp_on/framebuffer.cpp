@@ -32,6 +32,30 @@ bool CFramebuffer::CreateFrameBufferForDepthShadow(int a_iWidth, int a_iHeight)
 	return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
 
+bool CFramebuffer::CreateFrameBufferForDepthShadow(int a_iWidth, int a_iHeight, int a_iDepth)
+{
+	if (uiFramebuffer != 0)
+	{
+		return false;
+	}
+
+	glGenFramebuffers(1, &uiFramebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, uiFramebuffer);
+
+	tFramebufferTex.CreateDepthTexture(a_iWidth, a_iHeight, a_iDepth);
+
+	//FOR(l_i, a_iDepth) glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tFramebufferTex.GetTextureID(), 0, l_i);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, tFramebufferTex.GetTextureID(), 0);
+
+	glDrawBuffers(0, NULL); glReadBuffer(GL_NONE);
+
+	iWidth = a_iWidth;
+	iHeight = a_iHeight;
+	iDepth = a_iDepth;
+
+	return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
+}
+
 /*-----------------------------------------------
 
 Name:	CreateFramebufferWithTexture
@@ -124,8 +148,8 @@ Result:	Binds framebuffer texture, where renderings
 
 void CFramebuffer::BindFramebufferTexture(int iTextureUnit, bool bRegenMipMaps)
 {
-	tFramebufferTex.BindTexture(iTextureUnit);
-	if(bRegenMipMaps)glGenerateMipmap(GL_TEXTURE_2D);
+	tFramebufferTex.BindTextureArray(iTextureUnit);
+	if(bRegenMipMaps)glGenerateMipmap(GL_TEXTURE_2D_ARRAY);
 }
 
 /*-----------------------------------------------

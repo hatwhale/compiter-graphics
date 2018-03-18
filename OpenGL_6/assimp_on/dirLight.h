@@ -18,10 +18,12 @@ public:
 	glm::vec3 vDirection; // and its direction
 
 	float fAmbient;
-	int iSkybox;
+	bool bSkybox;
+	bool bSwitch;
 
 	void SetUniformData(CShaderProgram* spProgram, string sLightVarName);
+	void SetUniformData(CShaderProgram* spProgram, string sLightVarName, int index);
 
 	CDirectionalLight();
-	CDirectionalLight(glm::vec3 a_vColor, glm::vec3 a_vDirection, float a_fAmbient, int a_iSkybox);
+	CDirectionalLight(glm::vec3 a_vColor, float a_fAmbient);
 };

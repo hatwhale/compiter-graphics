@@ -74,6 +74,9 @@ public:
 	void SetUniform(string sName, int* iValues, int iCount = 1);
 	void SetUniform(string sName, const int iValue);
 
+	// Setting bool
+	void SetUniform(string sName, const bool bValue);
+
 	// Model and normal matrix setting ispretty common
 	void SetModelAndNormalMatrix(string sModelMatrixName, string sNormalMatrixName, glm::mat4 mModelMatrix);
 	void SetModelAndNormalMatrix(string sModelMatrixName, string sNormalMatrixName, glm::mat4* mModelMatrix);
@@ -88,7 +91,7 @@ private:
 bool PrepareShaderPrograms();
 void DeleteAllShaderPrograms();
 
-#define NUMSHADERS 17
+#define NUMSHADERS 18
 
 extern CShader shShaders[NUMSHADERS];
 extern CShaderProgram spMain, spOrtho2D, spFont2D, spNormalDisplayer, spMD2Animation, spSkybox, spShadowMapper, spShadowMapRender;

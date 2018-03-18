@@ -8,16 +8,16 @@ CDirectionalLight::CDirectionalLight()
 	vDirection = glm::vec3(0.0f, -1.0f, 0.0f);
 
 	fAmbient = 0.25f;
-	iSkybox = 0;
+	bSkybox = false;
+	bSwitch = true;
 }
 
-CDirectionalLight::CDirectionalLight(glm::vec3 a_vColor, glm::vec3 a_vDirection, float a_fAmbient, int a_iSkybox)
+CDirectionalLight::CDirectionalLight(glm::vec3 a_vColor, float a_fAmbient)
 {
 	vColor = a_vColor;
-	vDirection = a_vDirection;
-
 	fAmbient = a_fAmbient;
-	iSkybox = a_iSkybox;
+	bSkybox = false;
+	bSwitch = true;
 }
 
 /*-----------------------------------------------
@@ -37,5 +37,17 @@ void CDirectionalLight::SetUniformData(CShaderProgram *spProgram, std::string sL
 	spProgram->SetUniform(sLightVarName+".vDirection", vDirection);
 
 	spProgram->SetUniform(sLightVarName+".fAmbient", fAmbient);
-	spProgram->SetUniform(sLightVarName+".iSkybox", iSkybox);
+	spProgram->SetUniform(sLightVarName+".bSkybox", bSkybox);
+}
+
+void CDirectionalLight::SetUniformData(CShaderProgram *spProgram, std::string sLightVarName, int index)
+{
+	std::string sIndex = '[' + std::to_string(index) + ']';
+	spProgram->SetUniform(sLightVarName + sIndex + ".vColor", vColor);
+	spProgram->SetUniform(sLightVarName + sIndex + ".vDirection", vDirection);
+
+	spProgram->SetUniform(sLightVarName + sIndex + ".fAmbient", fAmbient);
+	spProgram->SetUniform(sLightVarName + sIndex + ".bSkybox", bSkybox);
+
+	spProgram->SetUniform(sLightVarName + sIndex + ".bSwitch", bSwitch);
 }

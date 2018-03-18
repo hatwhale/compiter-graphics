@@ -2,13 +2,14 @@
 
 out vec4 outputColor;
 
-uniform sampler2D shadowMap;
+uniform sampler2DArray shadowMap;
 
 smooth in vec2 vCoord;
+uniform int layer;
 
 void main()
 {
-	float depth = texture2D(shadowMap, vCoord).r;
+	float depth = 1.0 - texture(shadowMap, vec3(vCoord, layer)).r;
 
 	outputColor = vec4(depth, depth, depth, 1.0);
 }

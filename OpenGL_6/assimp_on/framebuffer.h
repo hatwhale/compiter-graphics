@@ -16,6 +16,7 @@ class CFramebuffer
 public:
 
 	bool CreateFrameBufferForDepthShadow(int a_iWidth, int a_iHeight);
+	bool CreateFrameBufferForDepthShadow(int a_iWidth, int a_iHeight, int a_iDepth);
 	
 
 	bool CreateFramebufferWithTexture(int a_iWidth, int a_iHeight);
@@ -36,7 +37,7 @@ public:
 
 	CFramebuffer();
 private:
-	int iWidth, iHeight;
+	int iWidth, iHeight, iDepth;
 	UINT uiFramebuffer;
 	UINT uiDepthRenderbuffer;
 	CTexture tFramebufferTex;

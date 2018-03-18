@@ -4,7 +4,7 @@
 
 #include "assimp_model.h"
 
-#pragma comment(lib, "assimp.lib")
+#pragma comment(lib, "assimp-vc140-mt.lib")
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
