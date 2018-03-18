@@ -5,7 +5,9 @@
 
 // набор параметров для вершинного шейдера
 static const char vertexShaderDefines[] =
-	"#version 330 core\n"
+	//"#version 330 core\n"
+	"#version 150 core\n"
+	"#extension GL_ARB_explicit_attrib_location : enable\n"
 	DEFINE_TO_STR(VERT_POSITION)
 	DEFINE_TO_STR(VERT_TEXCOORD)
 	DEFINE_TO_STR(VERT_NORMAL)
@@ -13,7 +15,9 @@ static const char vertexShaderDefines[] =
 
 // набор параметров для фрагментного шейдера
 static const char fragmentShaderDefines[] =
-	"#version 330 core\n"
+	//"#version 330 core\n"
+	"#version 150 core\n"
+	"#extension GL_ARB_explicit_attrib_location : enable\n"
 	DEFINE_TO_STR(FRAG_OUTPUT0)
 	"\n";
 
@@ -201,4 +205,16 @@ void ShaderProgramUnbind()
 {
 	// сделаем текущую шейдерную программу неактивной
 	glUseProgram(0);
+}
+
+void ShaderSetFloat(GLuint program, const GLchar *name, const float fValue)
+{
+	// установка данного float uniform в шейдерной программе
+	glUniform1fv(glGetUniformLocation(program, name), 1, &fValue);
+}
+
+void ShaderSetMatrix(GLuint program, const GLchar *name, const mat3 mMatrix)
+{
+	// установка данной mat3 uniform в шейдерной программе
+	glUniformMatrix3fv(glGetUniformLocation(program, name), 1, FALSE, (GLfloat*)&mMatrix);
 }
