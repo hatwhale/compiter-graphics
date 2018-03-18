@@ -47,5 +47,7 @@ F7 : twirl filter
 
 
 Alt + F.. + F.. : sum of effects
+
   change color border to 1.0
+  
   ORDER IS IMPORTANT
