@@ -1,3 +1,9 @@
+### Alt + Enter : fullscreen
+
+### Escape : close the programm
+
+### Backspace : set the default values of the parameters
+
 ### G + Up/Down : gamma change (0, +inf)
 ### M + Up/Down : mix coef change (0, 2)
 (0, 1) - mix a new image and the original image with color correction
@@ -39,7 +45,3 @@ change color border to 1.0
 
 #### Alt + F2 + F3 with high gamma and mix > 1.0: bloom effect
 #### Alt + F3 + F4 + F2 with high gamma: more quality edge detection
-
-### Alt + Enter : fullscreen
-
-### Escape : close the programm
