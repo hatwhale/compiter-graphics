@@ -1,5 +1,3 @@
-# OpenGL_1
-
 Getting started with OpenGL.
 
 ## Necessary libraries:
