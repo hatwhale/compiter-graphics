@@ -337,12 +337,11 @@ int GLWindowMainLoop()
 		// начало обработки текущего кадра
 		beginFrameTime = GetTimerTicks();
 
-		// обработка ввода
-		GLWindowInput(g_window);
-
 		// если окно в рабочем режиме и активно
 		if (g_window.running && g_window.active)
 		{
+			// обработка ввода
+			GLWindowInput(g_window);
 			// рендер сцены
 			GLWindowRender(g_window);
 			glFinish();
@@ -356,6 +355,7 @@ int GLWindowMainLoop()
 				deltaTime -= fixedTimeStep;
 			}
 		}
+		else Sleep(200);
 	}
 
 	g_window.running = g_window.active = false;
