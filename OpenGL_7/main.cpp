@@ -459,8 +459,8 @@ void GLWindowRender(const GLWindow &window)
 		// устанавливаем текстуру сцены в 0-й текстурный юнит
 		if (first_iter)
 		{
-			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[posteffectFBOsCount - 1]);
-			TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[posteffectFBOsCount - 1]);
+			TextureSetup(posteffectProgram, 0, "colorTexture", posteffectTextures[2]);
+			TextureSetup(posteffectProgram, 1, "depthTexture", posteffectDepthTextures[2]);
 		}
 		else
 		{
