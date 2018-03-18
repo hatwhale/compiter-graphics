@@ -35,7 +35,10 @@ Up/Down after clicking F6 : aberration repeat change [1, 2, ...]
 ### Alt + F.. + F.. : sum of filters
 change color border to 1.0
   
-ORDER IS IMPORTANT
+#### ORDER IS IMPORTANT, examples:
+
+#### Alt + F2 + F3 with high gamma and mix > 1.0: bloom effect
+#### Alt + F3 + F4 + F2 with high gamma: more quality edge detection
 
 ### Alt + Enter : fullscreen
 
