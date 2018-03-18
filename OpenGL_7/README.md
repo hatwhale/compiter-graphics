@@ -36,3 +36,7 @@ Up/Down after clicking F6 : aberration repeat change [1, 2, ...]
 change color border to 1.0
   
 ORDER IS IMPORTANT
+
+### Alt + Enter : fullscreen
+
+### Escape : close the programm
