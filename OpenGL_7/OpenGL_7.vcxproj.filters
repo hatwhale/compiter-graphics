@@ -144,10 +144,13 @@
     <None Include="data\shaders\extra_filters\mix.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
+    <None Include="data\shaders\extra_filters\add.frag">
+      <Filter>Resource Files\extra filters</Filter>
+    </None>
     <None Include="data\shaders\extra_filters\correct.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
-    <None Include="data\shaders\extra_filters\warp.frag">
+	<None Include="data\shaders\extra_filters\warp.frag">
       <Filter>Resource Files\extra filters</Filter>
     </None>
   </ItemGroup>
