@@ -35,7 +35,7 @@ vec3 filter(in vec2 texcoord)
 	for (int i = 0; i < KERNEL_SIZE; ++i)
 		res += texture(colorTexture, texcoord + offset[i] * pstep) * Kernel[i/3][i%3];
 
-	return vec3(dot(factor, vec3(res)));
+	return vec3(res);
 }
 
 void main(void)
