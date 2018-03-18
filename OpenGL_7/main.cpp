@@ -85,15 +85,16 @@ static Posteffect colorPosteffects[colorPosteffectsCount] = {
 };
 uint32_t colorPosteffectChoice = 0;
 
-static const uint32_t posteffectsCount = 5;
+static const uint32_t posteffectsCount = 6;
 static Posteffect posteffects[posteffectsCount] = {
 	// изначальные постэффекты
-	{VK_F3, "data/shaders/default_filters/blur.frag",       0},
-	{VK_F5, "data/shaders/default_filters/emboss.frag",     0},
-	{VK_F6, "data/shaders/default_filters/aberration.frag", 0},
+	{ VK_F3, "data/shaders/default_filters/blur.frag",       0},
+	{ VK_F5, "data/shaders/default_filters/emboss.frag",     0},
+	{ VK_F6, "data/shaders/default_filters/aberration.frag", 0},
 	// добавленные постэффекты
-	{VK_F2, "data/shaders/extra_filters/threshold.frag", 0},
-	{VK_F4, "data/shaders/extra_filters/edge.frag", 0}
+	{ VK_F2, "data/shaders/extra_filters/threshold.frag", 0},
+	{ VK_F4, "data/shaders/extra_filters/edge.frag", 0},
+	{ VK_F7, "data/shaders/extra_filters/warp.frag", 0 }
 };
 int32_t posteffectChoice = -1;
 
